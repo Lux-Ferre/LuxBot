@@ -4,6 +4,7 @@ from multiprocessing.queues import Queue
 from idle_pixel_bot import Game
 from wshandlers import WSHandlers
 from customs import Customs
+from chat import Chat
 
 
 class PrimaryHandler:
@@ -12,6 +13,7 @@ class PrimaryHandler:
         self.main_thread = self.create_main_process()
         self.ws_handlers = WSHandlers(self.p_q)
         self.customs = Customs(self.p_q)
+        self.chat = Chat(self.p_q)
 
         self.ws_handlers.apply_dispatch_map()
 
@@ -49,13 +51,16 @@ if __name__ == '__main__':
 
     while True:
         action = primary_queue.get()
-        if action["target"] == "main":
-            primary_handler.dispatch(action)
-        elif action["target"] == "ws_handlers":
-            primary_handler.ws_handlers.dispatch(action)
-        elif action["target"] == "game":
-            game_queue.put(action)
-        elif action["target"] == "custom":
-            primary_handler.customs.dispatch(action)
-        else:
-            print(action)
+        match action["target"]:
+            case "main":
+                primary_handler.dispatch(action)
+            case "ws_handlers":
+                primary_handler.ws_handlers.dispatch(action)
+            case "game":
+                game_queue.put(action)
+            case "custom":
+                primary_handler.customs.dispatch(action)
+            case "chat":
+                primary_handler.chat.handle(action)
+            case _:
+                print(action)

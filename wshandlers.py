@@ -35,7 +35,14 @@ class WSHandlers:
         message_target["target"](message)
 
     def on_chat(self, message: dict):
-        print(f"CHAT: {message}")
+        action = {
+            "target": "chat",
+            "action": "handle",
+            "payload": message["payload"],
+            "source": "chat",
+        }
+
+        self.p_q.put(action)
 
     def on_custom(self, message: dict):
         action = {
