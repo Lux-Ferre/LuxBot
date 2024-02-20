@@ -4,16 +4,26 @@ from multiprocessing.queues import Queue
 class Customs:
     def __init__(self, p_q: Queue):
         self.dispatch_map = {
+            "send": {
+                "target": self.send,
+            },
             "close": {
                 "target": self.close,
             },
             "print_items": {
-                "target": self.print_items
+                "target": self.print_items,
             },
+            "echo": {
+                "target": self.echo,
+            }
         }
         self.p_q = p_q
 
     def dispatch(self, action: dict):
+        if action["action"] == "send":
+            self.send(action["payload"])
+            return
+
         message = action["payload"]
         parsed_custom = self.parse(message["payload"])
         if parsed_custom["player"] != "a spider":
@@ -58,6 +68,28 @@ class Customs:
 
         return custom_data
 
+    def send(self, custom_data: dict):
+        player = custom_data.get("player", None)
+        callback_id = custom_data.get("callback_id", "IPP0")
+        plugin = custom_data.get("plugin", "LuxBot")
+        command = custom_data.get("command", None)
+        payload = custom_data.get("payload", "N/A")
+
+        if player and command:
+            custom_message = f"CUSTOM={player}~{callback_id}:{plugin}:{command}:{payload}"
+
+            action = {
+                "target": "game",
+                "action": "send_ws_message",
+                "payload": custom_message,
+                "source": "custom",
+            }
+
+            self.p_q.put(action)
+        else:
+            print("Invalid custom send:")
+            print(custom_data)
+
     def close(self, custom_data: dict):
         if custom_data["payload"] == "close":
             action = {
@@ -84,6 +116,22 @@ class Customs:
             "target": "game",
             "action": "print_items",
             "payload": "",
+            "source": "custom",
+        }
+
+        self.p_q.put(action)
+
+    def echo(self, custom_data: dict):
+        reply_data = {
+            "player": custom_data["player"],
+            "command": "Echo",
+            "payload": custom_data["payload"],
+        }
+
+        action = {
+            "target": "custom",
+            "action": "send",
+            "payload": reply_data,
             "source": "custom",
         }
 
