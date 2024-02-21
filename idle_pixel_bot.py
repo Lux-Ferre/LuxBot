@@ -1,15 +1,17 @@
 import asyncio
 import os
 import queue
-
 import websocket
 import rel
 import ssl
 import traceback
+
 from playwright.async_api import async_playwright
 from bs4 import BeautifulSoup
 from datetime import datetime
 from multiprocessing.queues import Queue
+
+from utils import RepeatTimer
 
 
 class Game:
@@ -51,6 +53,13 @@ class Game:
             env_const_dict[key] = self.get_env_var(key)
 
         return env_const_dict
+
+    def check_queue(self):
+        try:
+            new_action = self.game_queue.get(False)
+            self.dispatch(new_action)
+        except queue.Empty:
+            pass
 
     async def get_signature(self) -> str:
         """
@@ -116,12 +125,6 @@ class Game:
         }
 
         self.p_q.put(action)
-
-        try:
-            new_action = self.game_queue.get(False)
-            self.dispatch(new_action)
-        except queue.Empty:
-            pass
 
     def on_ws_error(self, ws, error):
         """
@@ -198,6 +201,9 @@ class Game:
 
     def run(self):
         self.env_consts = self.get_env_consts()
+
+        queue_timer = RepeatTimer(0.1, self.check_queue)
+        queue_timer.start()
 
         websocket.enableTrace(False)
         self.game_ws = websocket.WebSocketApp("wss://server1.idle-pixel.com",
