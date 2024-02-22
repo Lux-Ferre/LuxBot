@@ -6,6 +6,7 @@ from wshandlers import WSHandlers
 from customs import Customs
 from chat import Chat
 from repo import Repo
+from fun_stuff import Fun
 
 
 class PrimaryHandler:
@@ -16,6 +17,7 @@ class PrimaryHandler:
         self.ws_handlers = WSHandlers(self.p_q)
         self.customs = Customs(self.p_q, self.db)
         self.chat = Chat(self.p_q, self.db)
+        self.fun = Fun(self.p_q, self.db)
 
         self.ws_handlers.apply_dispatch_map()
 
@@ -64,7 +66,7 @@ if __name__ == '__main__':
                 primary_handler.customs.dispatch(action)
             case "chat":
                 primary_handler.chat.handle(action)
-            case "db":
-                primary_handler.db.dispatch(action)
+            case "fun":
+                primary_handler.fun.dispatch(action)
             case _:
                 print(action)

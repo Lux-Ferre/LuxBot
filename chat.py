@@ -79,27 +79,14 @@ class Chat:
 
     def handle_luxbot_command(self, message: dict):
         parsed_command = self.parse_luxbot_command(message["message"])
-        player = message["player"]
+        message["parsed_command"] = parsed_command
 
         if parsed_command["command"] == "pet":
-            if parsed_command['payload'] is not None:
-                query = "SELECT title, pet, link FROM pet_links WHERE pet=? ORDER BY RANDOM() LIMIT 1;"
-                params = (parsed_command['payload'].lower(),)
-            else:
-                query = "SELECT title, pet, link FROM pet_links ORDER BY RANDOM() LIMIT 1;"
-                params = tuple()
-
-            query_data = {
-                "query": query,
-                "params": params,
-                "many": False
+            action = {
+                "target": "fun",
+                "action": "get_pet_link",
+                "payload": message,
+                "source": "chat",
             }
 
-            pet_link = self.db.fetch_db(query_data)
-
-            if pet_link is None:
-                reply_string = f"Sorry {player['username'].capitalize()}, that is an invalid pet name."
-            else:
-                reply_string = f"{player['username'].capitalize()}, your random pet is {pet_link[1].capitalize()}! {pet_link[0].capitalize()}: {pet_link[2]}"
-
-            print(reply_string)
+            self.p_q.put(action)
