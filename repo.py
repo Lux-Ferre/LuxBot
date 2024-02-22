@@ -105,6 +105,16 @@ class Repo:
 
         return pet_link
 
+    def get_pet_link_by_title(self, payload: dict):
+        title = payload["title"]
+
+        query = "SELECT title, pet, link FROM pet_links WHERE title=? LIMIT 1;"
+        params = (title.lower(),)
+
+        pet_link = self.database.fetch_db(query, params, False)
+
+        return pet_link
+
     def fetch_db(self, action: dict):
         return self.database.fetch_db(action["query"], action["params"], action["many"])
 

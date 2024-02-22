@@ -81,12 +81,23 @@ class Chat:
         parsed_command = self.parse_luxbot_command(message["message"])
         message["parsed_command"] = parsed_command
 
-        if parsed_command["command"] == "pet":
-            action = {
-                "target": "fun",
-                "action": "get_pet_link",
-                "payload": message,
-                "source": "chat",
-            }
+        match parsed_command["command"]:
+            case "pet":
+                action = {
+                    "target": "fun",
+                    "action": "get_pet_link",
+                    "payload": message,
+                    "source": "chat",
+                }
 
-            self.p_q.put(action)
+                self.p_q.put(action)
+            case "pet_title":
+                action = {
+                    "target": "fun",
+                    "action": "get_pet_link_by_title",
+                    "payload": message,
+                    "source": "chat",
+                }
+
+                self.p_q.put(action)
+
