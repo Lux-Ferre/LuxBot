@@ -51,5 +51,55 @@ class Chat:
 
         print(parsed_message)
 
-    def handle_luxbot_command(self, message):
-        print("LuxBot command registered")
+    def parse_luxbot_command(self, raw_message):
+        split_message = raw_message.split(" ", 1)  # !luxbot:command payload @message -> ['!luxbot:command', 'payload @message']
+
+        trigger_and_command = split_message[0]
+        split_command = trigger_and_command.split(":", 1)
+        command = split_command[1].lower()
+
+        payload = None
+        at_message = None
+
+        if len(split_message) > 1:
+            split_at = split_message[1].split("@", 1)
+            payload = split_at[0].strip()
+            if payload == "":  # Handle case of message and no payload
+                payload = None
+            if len(split_at) > 1:
+                at_message = split_at[1]
+
+        parsed_command = {
+            "command": command,
+            "payload": payload,
+            "at_message": at_message,
+        }
+
+        return parsed_command
+
+    def handle_luxbot_command(self, message: dict):
+        parsed_command = self.parse_luxbot_command(message["message"])
+        player = message["player"]
+
+        if parsed_command["command"] == "pet":
+            if parsed_command['payload'] is not None:
+                query = "SELECT title, pet, link FROM pet_links WHERE pet=? ORDER BY RANDOM() LIMIT 1;"
+                params = (parsed_command['payload'].lower(),)
+            else:
+                query = "SELECT title, pet, link FROM pet_links ORDER BY RANDOM() LIMIT 1;"
+                params = tuple()
+
+            query_data = {
+                "query": query,
+                "params": params,
+                "many": False
+            }
+
+            pet_link = self.db.fetch_db(query_data)
+
+            if pet_link is None:
+                reply_string = f"Sorry {player['username'].capitalize()}, that is an invalid pet name."
+            else:
+                reply_string = f"{player['username'].capitalize()}, your random pet is {pet_link[1].capitalize()}! {pet_link[0].capitalize()}: {pet_link[2]}"
+
+            print(reply_string)
