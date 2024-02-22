@@ -48,10 +48,10 @@ class Fun:
             }
 
             action = {
-                "target": "custom",
+                "target": "chat",
                 "action": "send",
                 "payload": reply_data,
-                "source": "custom",
+                "source": "chat",
             }
 
             self.p_q.put(action)
@@ -79,10 +79,10 @@ class Fun:
             }
 
             action = {
-                "target": "custom",
+                "target": "chat",
                 "action": "send",
                 "payload": reply_data,
-                "source": "custom",
+                "source": "chat",
             }
 
             self.p_q.put(action)

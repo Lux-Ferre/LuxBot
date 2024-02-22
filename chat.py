@@ -7,23 +7,23 @@ class Chat:
     def __init__(self, p_q: Queue, db: Repo):
         self.dispatch_map = {
             "handle": {
-                "target": self.handle,
-            }
+                "target": self.handle
+            },
+            "send": {
+                "target": self.send,
+            },
         }
         self.p_q = p_q
         self.db = db
 
     def dispatch(self, action: dict):
-        message = action["payload"]
-        message_type = message["type"]
+        dispatch_target = self.dispatch_map.get(action["action"], None)
 
-        message_target = self.dispatch_map.get(message_type, None)
-
-        if message_target is None:
-            print(f"Chat dispatch error: No handler for {message_type}")
+        if dispatch_target is None:
+            print(f"Chat dispatch error: No handler for {action['action']}")
             return
 
-        message_target["target"](message)
+        dispatch_target["target"](action)
 
     def parse_chat(self, raw_message: str) -> dict:
         raw_split = raw_message.split("~")
@@ -43,6 +43,10 @@ class Chat:
         return message_data
 
     def handle(self, action: dict):
+        if action["action"] == "send":
+            self.dispatch(action)
+            return
+
         parsed_message = self.parse_chat(action["payload"])
 
         if parsed_message["message"][0] == "!":
@@ -50,6 +54,18 @@ class Chat:
                 self.handle_luxbot_command(parsed_message)
 
         print(parsed_message)
+
+    def send(self, action: dict):
+        message = f"CHAT={action['payload']['payload']}"
+
+        action = {
+            "target": "game",
+            "action": "send_ws_message",
+            "payload": message,
+            "source": "chat",
+        }
+
+        self.p_q.put(action)
 
     def parse_luxbot_command(self, raw_message):
         split_message = raw_message.split(" ", 1)  # !luxbot:command payload @message -> ['!luxbot:command', 'payload @message']
