@@ -28,20 +28,9 @@ class Fun:
         player = message["player"]
         request_source = action["source"]
 
-        if parsed_command['payload'] is not None:
-            query = "SELECT title, pet, link FROM pet_links WHERE pet=? ORDER BY RANDOM() LIMIT 1;"
-            params = (parsed_command['payload'].lower(),)
-        else:
-            query = "SELECT title, pet, link FROM pet_links ORDER BY RANDOM() LIMIT 1;"
-            params = tuple()
+        req = {"pet": parsed_command['payload']}
 
-        query_data = {
-            "query": query,
-            "params": params,
-            "many": False
-        }
-
-        pet_link = self.db.fetch_db(query_data)
+        pet_link = self.db.get_pet_link(req)
 
         if pet_link is None:
             reply_string = f"Sorry {player['username'].capitalize()}, that is an invalid pet name."
@@ -63,5 +52,3 @@ class Fun:
             }
 
             self.p_q.put(action)
-
-        print(reply_string)

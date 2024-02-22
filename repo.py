@@ -92,6 +92,19 @@ class Repo:
 
         self.database.con.commit()
 
+    def get_pet_link(self, payload: dict):
+        pet_name = payload.get("pet", None)
+        if pet_name is not None:
+            query = "SELECT title, pet, link FROM pet_links WHERE pet=? ORDER BY RANDOM() LIMIT 1;"
+            params = (pet_name.lower(),)
+        else:
+            query = "SELECT title, pet, link FROM pet_links ORDER BY RANDOM() LIMIT 1;"
+            params = tuple()
+
+        pet_link = self.database.fetch_db(query, params, False)
+
+        return pet_link
+
     def fetch_db(self, action: dict):
         return self.database.fetch_db(action["query"], action["params"], action["many"])
 
