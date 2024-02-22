@@ -1,8 +1,10 @@
 from multiprocessing.queues import Queue
 
+from repo import Repo
+
 
 class Customs:
-    def __init__(self, p_q: Queue):
+    def __init__(self, p_q: Queue, db: Repo):
         self.dispatch_map = {
             "send": {
                 "target": self.send,
@@ -15,9 +17,13 @@ class Customs:
             },
             "echo": {
                 "target": self.echo,
+            },
+            "print_pets": {
+                "target": self.print_pets
             }
         }
         self.p_q = p_q
+        self.db = db
 
     def dispatch(self, action: dict):
         if action["action"] == "send":
@@ -120,6 +126,13 @@ class Customs:
         }
 
         self.p_q.put(action)
+
+    def print_pets(self, custom_data: dict):
+        pet_name = custom_data["payload"]
+
+        pet_links = self.db.get_pet_links({"pet": pet_name})
+
+        print(pet_links)
 
     def echo(self, custom_data: dict):
         reply_data = {

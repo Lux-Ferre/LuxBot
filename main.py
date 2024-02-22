@@ -5,15 +5,17 @@ from idle_pixel_bot import Game
 from wshandlers import WSHandlers
 from customs import Customs
 from chat import Chat
+from repo import Repo
 
 
 class PrimaryHandler:
     def __init__(self, p_queue: Queue):
         self.p_q = p_queue
+        self.db = Repo()
         self.main_thread = self.create_main_process()
         self.ws_handlers = WSHandlers(self.p_q)
-        self.customs = Customs(self.p_q)
-        self.chat = Chat(self.p_q)
+        self.customs = Customs(self.p_q, self.db)
+        self.chat = Chat(self.p_q, self.db)
 
         self.ws_handlers.apply_dispatch_map()
 
@@ -62,5 +64,7 @@ if __name__ == '__main__':
                 primary_handler.customs.dispatch(action)
             case "chat":
                 primary_handler.chat.handle(action)
+            case "db":
+                primary_handler.db.dispatch(action)
             case _:
                 print(action)

@@ -1,14 +1,17 @@
 from multiprocessing.queues import Queue
 
+from repo import Repo
+
 
 class Chat:
-    def __init__(self, p_q: Queue):
+    def __init__(self, p_q: Queue, db: Repo):
         self.dispatch_map = {
             "handle": {
                 "target": self.handle,
             }
         }
         self.p_q = p_q
+        self.db = db
 
     def dispatch(self, action: dict):
         message = action["payload"]
@@ -22,7 +25,7 @@ class Chat:
 
         message_target["target"](message)
 
-    def parse(self, raw_message: str) -> dict:
+    def parse_chat(self, raw_message: str) -> dict:
         raw_split = raw_message.split("~")
         player = {
             "username": raw_split[0],
@@ -40,6 +43,13 @@ class Chat:
         return message_data
 
     def handle(self, action: dict):
-        parsed_message = self.parse(action["payload"])
+        parsed_message = self.parse_chat(action["payload"])
+
+        if parsed_message["message"][0] == "!":
+            if parsed_message["message"][:8].lower() == "!luxbot:":
+                self.handle_luxbot_command(parsed_message)
 
         print(parsed_message)
+
+    def handle_luxbot_command(self, message):
+        print("LuxBot command registered")
