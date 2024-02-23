@@ -14,6 +14,9 @@ class Fun:
             "get_pet_link_by_title": {
                 "target": self.get_pet_link_by_title
             },
+            "dho_maps": {
+                "target": self.dho_maps
+            }
         }
 
     def dispatch(self, action: dict):
@@ -70,6 +73,29 @@ class Fun:
             reply_string = f"Sorry {player['username'].capitalize()}, that is an invalid pet image title."
         else:
             reply_string = f"{player['username'].capitalize()}, your requested pet is {pet_link[1].capitalize()}! {pet_link[0].capitalize()}: {pet_link[2]}"
+
+        if request_source == "chat":
+            reply_data = {
+                "player": player["username"],
+                "command": "pet_link",
+                "payload": reply_string,
+            }
+
+            action = {
+                "target": "chat",
+                "action": "send",
+                "payload": reply_data,
+                "source": "chat",
+            }
+
+            self.p_q.put(action)
+
+    def dho_maps(self, action: dict):
+        message = action["payload"]
+        player = message["player"]
+        request_source = action["source"]
+
+        reply_string = f"Offline map solutions: https://prnt.sc/Mdd-AKMIHfLz"
 
         if request_source == "chat":
             reply_data = {

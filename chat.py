@@ -116,4 +116,12 @@ class Chat:
                 }
 
                 self.p_q.put(action)
+            case "dho_maps":
+                action = {
+                    "target": "fun",
+                    "action": "dho_maps",
+                    "payload": message,
+                    "source": "chat",
+                }
 
+                self.p_q.put(action)
