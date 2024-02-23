@@ -115,6 +115,13 @@ class Repo:
 
         return pet_link
 
+    def get_pet_stats(self):
+        query = "SELECT pet, GROUP_CONCAT(title) FROM pet_links GROUP BY pet"
+        params = tuple()
+        pet_data = self.database.fetch_db(query, params, True)
+
+        return pet_data
+
     def fetch_db(self, action: dict):
         return self.database.fetch_db(action["query"], action["params"], action["many"])
 

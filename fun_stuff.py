@@ -1,6 +1,7 @@
 from multiprocessing.queues import Queue
 
 from repo import Repo
+from utils import Utils
 
 
 class Fun:
@@ -19,6 +20,9 @@ class Fun:
             },
             "wiki": {
                 "target": self.wiki
+            },
+            "pet_stats": {
+                "target": self.pet_stats
             },
         }
 
@@ -132,6 +136,43 @@ class Fun:
             reply_data = {
                 "player": player["username"],
                 "command": "wiki",
+                "payload": reply_string,
+            }
+
+            action = {
+                "target": "chat",
+                "action": "send",
+                "payload": reply_data,
+                "source": "chat",
+            }
+
+            self.p_q.put(action)
+
+    def pet_stats(self, action: dict):
+        message = action["payload"]
+        player = message["player"]
+        request_source = action["source"]
+
+        all_stats = self.db.get_pet_stats()
+
+        output_string = ""
+
+        for stat in all_stats:
+            pet, title_string = stat
+            titles = title_string.split(",")
+            title_count = len(titles)
+            output_string += f"{pet.capitalize()}({title_count}):\n"
+            for title in titles:
+                output_string += f"\t{title.capitalize()}\n"
+
+        pastebin_url = Utils.dump_to_pastebin(output_string, "10M")
+
+        reply_string = f"{pastebin_url}"
+
+        if request_source == "chat":
+            reply_data = {
+                "player": player["username"],
+                "command": "pet_stats",
                 "payload": reply_string,
             }
 

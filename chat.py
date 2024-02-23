@@ -134,3 +134,12 @@ class Chat:
                 }
 
                 self.p_q.put(action)
+            case "pet_stats":
+                action = {
+                    "target": "fun",
+                    "action": "pet_stats",
+                    "payload": message,
+                    "source": "chat",
+                }
+
+                self.p_q.put(action)
