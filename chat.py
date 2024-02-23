@@ -125,3 +125,12 @@ class Chat:
                 }
 
                 self.p_q.put(action)
+            case "wiki":
+                action = {
+                    "target": "fun",
+                    "action": "wiki",
+                    "payload": message,
+                    "source": "chat",
+                }
+
+                self.p_q.put(action)

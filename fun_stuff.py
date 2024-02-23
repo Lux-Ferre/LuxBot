@@ -16,7 +16,10 @@ class Fun:
             },
             "dho_maps": {
                 "target": self.dho_maps
-            }
+            },
+            "wiki": {
+                "target": self.wiki
+            },
         }
 
     def dispatch(self, action: dict):
@@ -100,7 +103,35 @@ class Fun:
         if request_source == "chat":
             reply_data = {
                 "player": player["username"],
-                "command": "pet_link",
+                "command": "dho_maps",
+                "payload": reply_string,
+            }
+
+            action = {
+                "target": "chat",
+                "action": "send",
+                "payload": reply_data,
+                "source": "chat",
+            }
+
+            self.p_q.put(action)
+
+    def wiki(self, action: dict):
+        message = action["payload"]
+        player = message["player"]
+        request_source = action["source"]
+
+        command = message["parsed_command"]
+
+        if command['payload'] is not None:
+            reply_string = f"Wiki page for {command['payload']}: https://idle-pixel.wiki/index.php/{command['payload']}"
+        else:
+            reply_string = f"Wiki home page: https://idle-pixel.wiki/index.php/Main_Page"
+
+        if request_source == "chat":
+            reply_data = {
+                "player": player["username"],
+                "command": "wiki",
                 "payload": reply_string,
             }
 
