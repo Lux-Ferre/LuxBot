@@ -143,3 +143,21 @@ class Chat:
                 }
 
                 self.p_q.put(action)
+            case "import":
+                action = {
+                    "target": "fun",
+                    "action": "import_command",
+                    "payload": message,
+                    "source": "chat",
+                }
+
+                self.p_q.put(action)
+            case "sigil_list":
+                action = {
+                    "target": "fun",
+                    "action": "sigil_list",
+                    "payload": message,
+                    "source": "chat",
+                }
+
+                self.p_q.put(action)

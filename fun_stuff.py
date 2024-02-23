@@ -24,6 +24,12 @@ class Fun:
             "pet_stats": {
                 "target": self.pet_stats
             },
+            "import_command": {
+                "target": self.import_command
+            },
+            "sigil_list": {
+                "target": self.sigil_list
+            },
         }
 
     def dispatch(self, action: dict):
@@ -173,6 +179,56 @@ class Fun:
             reply_data = {
                 "player": player["username"],
                 "command": "pet_stats",
+                "payload": reply_string,
+            }
+
+            action = {
+                "target": "chat",
+                "action": "send",
+                "payload": reply_data,
+                "source": "chat",
+            }
+
+            self.p_q.put(action)
+
+    def import_command(self, action: dict):
+        message = action["payload"]
+        player = message["player"]
+        request_source = action["source"]
+        command = message["parsed_command"]
+
+        if command['payload'] != "antigravity":
+            return
+
+        reply_string = "https://xkcd.com/353"
+
+        if request_source == "chat":
+            reply_data = {
+                "player": player["username"],
+                "command": "import",
+                "payload": reply_string,
+            }
+
+            action = {
+                "target": "chat",
+                "action": "send",
+                "payload": reply_data,
+                "source": "chat",
+            }
+
+            self.p_q.put(action)
+
+    def sigil_list(self, action: dict):
+        message = action["payload"]
+        player = message["player"]
+        request_source = action["source"]
+
+        reply_string = f"{player['username'].capitalize()} here's (an out-dated) image of Lux's sigils: https://prnt.sc/zs7CX4WjB8q8"
+
+        if request_source == "chat":
+            reply_data = {
+                "player": player["username"],
+                "command": "sigil_list",
                 "payload": reply_string,
             }
 
