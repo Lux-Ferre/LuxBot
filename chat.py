@@ -6,24 +6,68 @@ from repo import Repo
 class Chat:
     def __init__(self, p_q: Queue, db: Repo):
         self.dispatch_map = {
-            "handle": {
-                "target": self.handle
+            "pet": {
+                "target_module": "fun",
+                "target_command": "get_pet_link",
+                "permission": 0,
+                "help_string": "",
             },
-            "send": {
-                "target": self.send,
+            "pet_title": {
+                "target_module": "fun",
+                "target_command": "get_pet_link_by_title",
+                "permission": 0,
+                "help_string": "",
+            },
+            "dho_maps": {
+                "target_module": "fun",
+                "target_command": "dho_maps",
+                "permission": 0,
+                "help_string": "",
+            },
+            "wiki": {
+                "target_module": "fun",
+                "target_command": "wiki",
+                "permission": 0,
+                "help_string": "",
+            },
+            "pet_stats": {
+                "target_module": "fun",
+                "target_command": "pet_stats",
+                "permission": 0,
+                "help_string": "",
+            },
+            "import": {
+                "target_module": "fun",
+                "target_command": "import_command",
+                "permission": 0,
+                "help_string": "",
+            },
+            "sigil_list": {
+                "target_module": "fun",
+                "target_command": "sigil_list",
+                "permission": 0,
+                "help_string": "",
             },
         }
         self.p_q = p_q
         self.db = db
 
-    def dispatch(self, action: dict):
-        dispatch_target = self.dispatch_map.get(action["action"], None)
+    def dispatch(self, message: dict):
+        command = message["parsed_command"]["command"]
+        dispatch_target = self.dispatch_map.get(command, None)
 
         if dispatch_target is None:
-            print(f"Chat dispatch error: No handler for {action['action']}")
+            print(f"Chat dispatch error: No handler for {command}")
             return
 
-        dispatch_target["target"](action)
+        new_action = {
+                    "target": dispatch_target["target_module"],
+                    "action": dispatch_target["target_command"],
+                    "payload": message,
+                    "source": "chat",
+        }
+
+        self.p_q.put(new_action)
 
     def parse_chat(self, raw_message: str) -> dict:
         raw_split = raw_message.split("~")
@@ -44,7 +88,7 @@ class Chat:
 
     def handle(self, action: dict):
         if action["action"] == "send":
-            self.dispatch(action)
+            self.send(action)
             return
 
         parsed_message = self.parse_chat(action["payload"])
@@ -97,67 +141,5 @@ class Chat:
         parsed_command = self.parse_luxbot_command(message["message"])
         message["parsed_command"] = parsed_command
 
-        match parsed_command["command"]:
-            case "pet":
-                action = {
-                    "target": "fun",
-                    "action": "get_pet_link",
-                    "payload": message,
-                    "source": "chat",
-                }
-
-                self.p_q.put(action)
-            case "pet_title":
-                action = {
-                    "target": "fun",
-                    "action": "get_pet_link_by_title",
-                    "payload": message,
-                    "source": "chat",
-                }
-
-                self.p_q.put(action)
-            case "dho_maps":
-                action = {
-                    "target": "fun",
-                    "action": "dho_maps",
-                    "payload": message,
-                    "source": "chat",
-                }
-
-                self.p_q.put(action)
-            case "wiki":
-                action = {
-                    "target": "fun",
-                    "action": "wiki",
-                    "payload": message,
-                    "source": "chat",
-                }
-
-                self.p_q.put(action)
-            case "pet_stats":
-                action = {
-                    "target": "fun",
-                    "action": "pet_stats",
-                    "payload": message,
-                    "source": "chat",
-                }
-
-                self.p_q.put(action)
-            case "import":
-                action = {
-                    "target": "fun",
-                    "action": "import_command",
-                    "payload": message,
-                    "source": "chat",
-                }
-
-                self.p_q.put(action)
-            case "sigil_list":
-                action = {
-                    "target": "fun",
-                    "action": "sigil_list",
-                    "payload": message,
-                    "source": "chat",
-                }
-
-                self.p_q.put(action)
+        self.dispatch(message)
+        
