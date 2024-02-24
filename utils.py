@@ -25,3 +25,24 @@ class Utils:
         response = requests.post(url=url, data=data)
 
         return response.text
+
+    @staticmethod
+    def gen_send_action(target: str, reply_data: dict):
+        send_action = None
+
+        if target == "chat":
+            send_action = {
+                "target": "chat",
+                "action": "send",
+                "payload": reply_data,
+                "source": "chat",
+            }
+        elif target == "custom":
+            send_action = {
+                "target": "custom",
+                "action": "send",
+                "payload": reply_data,
+                "source": "chat",
+            }
+
+        return send_action
