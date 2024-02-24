@@ -159,6 +159,12 @@ class Chat:
         parsed_command = self.parse_luxbot_command(message["message"])
         message["parsed_command"] = parsed_command
 
+        req_perm = self.dispatch_map[parsed_command["command"]]["permission"]
+
+        if message["player"]["perm_level"] < req_perm:
+            print(f"{message['player']['username']}[{message['player']['perm_level']}] attempted command {parsed_command['command']}[{req_perm}]!")
+            return
+
         if parsed_command["command"] == "help":
             self.handle_help_command(message)
         else:
