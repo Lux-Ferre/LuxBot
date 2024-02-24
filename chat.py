@@ -48,6 +48,12 @@ class Chat:
                 "permission": 0,
                 "help_string": "",
             },
+            "better_calc": {
+                "target_module": "fun",
+                "target_command": "better_calc",
+                "permission": 0,
+                "help_string": "",
+            },
         }
         self.p_q = p_q
         self.db = db

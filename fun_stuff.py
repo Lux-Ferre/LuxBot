@@ -32,6 +32,9 @@ class Fun:
             "sigil_list": {
                 "target": self.sigil_list
             },
+            "better_calc": {
+                "target": self.better_calc
+            },
         }
 
     def dispatch(self, action: dict):
@@ -212,6 +215,78 @@ class Fun:
         reply_data = {
             "player": player["username"],
             "command": "sigil_list",
+            "payload": reply_string,
+        }
+
+        send_action = Utils.gen_send_action(request_source, reply_data)
+
+        if send_action:
+            self.p_q.put(send_action)
+        else:
+            print("fun_stuff error: Invalid source for send.")
+
+    def better_calc(self, action):
+        message = action["payload"]
+        player = message["player"]
+        request_source = action["source"]
+
+        command = message["parsed_command"]
+
+        def parse_input(raw_input: str) -> list:
+            pattern = re.compile(r"([+/*-])")
+            input_with_spaces = re.sub(pattern, r" \1 ", raw_input)
+
+            input_list = input_with_spaces.split()
+
+            def is_floatable(n):
+                n = n.replace(".", "", 1)
+                return n.isnumeric()
+
+            converted_list = [float(value) if is_floatable(value) else value for value in input_list]
+
+            for value in converted_list:
+                if not (isinstance(value, float) or re.search(pattern, value)):
+                    raise ValueError
+
+            return converted_list
+
+        if command['payload'] is not None:
+            input_string = command["payload"]
+        else:
+            return
+
+        calculation_map = {
+            "*": (lambda a, b: a * b),
+            "/": (lambda a, b: a / b),
+            "+": (lambda a, b: a + b),
+            "-": (lambda a, b: a - b),
+        }
+
+        parsed_list = parse_input(input_string)
+
+        if len(parsed_list) % 2 == 0:
+            return
+
+        for operator, func in calculation_map.items():
+            while operator in parsed_list:
+                op_index = parsed_list.index(operator)
+
+                a = parsed_list[op_index - 1]
+                b = parsed_list[op_index + 1]
+
+                if operator == "/" and b == 0:
+                    print("Better calc: divide by zero error.")
+                    return
+                new_value = func(a, b)
+
+                parsed_list[op_index - 1] = new_value
+                del parsed_list[op_index:op_index + 2]
+
+        reply_string = f"{player['username'].capitalize()}, here is the result: {parsed_list[0]}"
+
+        reply_data = {
+            "player": player["username"],
+            "command": "better_calc",
             "payload": reply_string,
         }
 
