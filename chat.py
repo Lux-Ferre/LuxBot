@@ -83,6 +83,11 @@ class Chat:
             "tag": raw_split[2],
             "level": raw_split[3],
         }
+
+        req = {"player": player["username"]}
+
+        player["perm_level"] = self.db.permission_level(req)
+
         message = raw_split[4]
 
         message_data = {
