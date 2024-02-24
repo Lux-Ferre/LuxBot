@@ -1,3 +1,5 @@
+import re
+
 from multiprocessing.queues import Queue
 
 from repo import Repo
@@ -56,21 +58,18 @@ class Fun:
         else:
             reply_string = f"{player['username'].capitalize()}, your random pet is {pet_link[1].capitalize()}! {pet_link[0].capitalize()}: {pet_link[2]}"
 
-        if request_source == "chat":
-            reply_data = {
-                "player": player["username"],
-                "command": "pet_link",
-                "payload": reply_string,
-            }
+        reply_data = {
+            "player": player["username"],
+            "command": "pet_link",
+            "payload": reply_string,
+        }
 
-            action = {
-                "target": "chat",
-                "action": "send",
-                "payload": reply_data,
-                "source": "chat",
-            }
+        send_action = Utils.gen_send_action(request_source, reply_data)
 
-            self.p_q.put(action)
+        if send_action:
+            self.p_q.put(send_action)
+        else:
+            print("fun_stuff error: Invalid source for send.")
 
     def get_pet_link_by_title(self, action: dict):
         message = action["payload"]
@@ -87,21 +86,18 @@ class Fun:
         else:
             reply_string = f"{player['username'].capitalize()}, your requested pet is {pet_link[1].capitalize()}! {pet_link[0].capitalize()}: {pet_link[2]}"
 
-        if request_source == "chat":
-            reply_data = {
-                "player": player["username"],
-                "command": "pet_link",
-                "payload": reply_string,
-            }
+        reply_data = {
+            "player": player["username"],
+            "command": "pet_link_by_title",
+            "payload": reply_string,
+        }
 
-            action = {
-                "target": "chat",
-                "action": "send",
-                "payload": reply_data,
-                "source": "chat",
-            }
+        send_action = Utils.gen_send_action(request_source, reply_data)
 
-            self.p_q.put(action)
+        if send_action:
+            self.p_q.put(send_action)
+        else:
+            print("fun_stuff error: Invalid source for send.")
 
     def dho_maps(self, action: dict):
         message = action["payload"]
@@ -110,21 +106,18 @@ class Fun:
 
         reply_string = f"Offline map solutions: https://prnt.sc/Mdd-AKMIHfLz"
 
-        if request_source == "chat":
-            reply_data = {
-                "player": player["username"],
-                "command": "dho_maps",
-                "payload": reply_string,
-            }
+        reply_data = {
+            "player": player["username"],
+            "command": "dho_maps",
+            "payload": reply_string,
+        }
 
-            action = {
-                "target": "chat",
-                "action": "send",
-                "payload": reply_data,
-                "source": "chat",
-            }
+        send_action = Utils.gen_send_action(request_source, reply_data)
 
-            self.p_q.put(action)
+        if send_action:
+            self.p_q.put(send_action)
+        else:
+            print("fun_stuff error: Invalid source for send.")
 
     def wiki(self, action: dict):
         message = action["payload"]
@@ -138,21 +131,18 @@ class Fun:
         else:
             reply_string = f"Wiki home page: https://idle-pixel.wiki/index.php/Main_Page"
 
-        if request_source == "chat":
-            reply_data = {
-                "player": player["username"],
-                "command": "wiki",
-                "payload": reply_string,
-            }
+        reply_data = {
+            "player": player["username"],
+            "command": "wiki",
+            "payload": reply_string,
+        }
 
-            action = {
-                "target": "chat",
-                "action": "send",
-                "payload": reply_data,
-                "source": "chat",
-            }
+        send_action = Utils.gen_send_action(request_source, reply_data)
 
-            self.p_q.put(action)
+        if send_action:
+            self.p_q.put(send_action)
+        else:
+            print("fun_stuff error: Invalid source for send.")
 
     def pet_stats(self, action: dict):
         message = action["payload"]
@@ -175,21 +165,18 @@ class Fun:
 
         reply_string = f"{pastebin_url}"
 
-        if request_source == "chat":
-            reply_data = {
-                "player": player["username"],
-                "command": "pet_stats",
-                "payload": reply_string,
-            }
+        reply_data = {
+            "player": player["username"],
+            "command": "pet_stats",
+            "payload": reply_string,
+        }
 
-            action = {
-                "target": "chat",
-                "action": "send",
-                "payload": reply_data,
-                "source": "chat",
-            }
+        send_action = Utils.gen_send_action(request_source, reply_data)
 
-            self.p_q.put(action)
+        if send_action:
+            self.p_q.put(send_action)
+        else:
+            print("fun_stuff error: Invalid source for send.")
 
     def import_command(self, action: dict):
         message = action["payload"]
@@ -202,21 +189,18 @@ class Fun:
 
         reply_string = "https://xkcd.com/353"
 
-        if request_source == "chat":
-            reply_data = {
-                "player": player["username"],
-                "command": "import",
-                "payload": reply_string,
-            }
+        reply_data = {
+            "player": player["username"],
+            "command": "import",
+            "payload": reply_string,
+        }
 
-            action = {
-                "target": "chat",
-                "action": "send",
-                "payload": reply_data,
-                "source": "chat",
-            }
+        send_action = Utils.gen_send_action(request_source, reply_data)
 
-            self.p_q.put(action)
+        if send_action:
+            self.p_q.put(send_action)
+        else:
+            print("fun_stuff error: Invalid source for send.")
 
     def sigil_list(self, action: dict):
         message = action["payload"]
@@ -225,18 +209,15 @@ class Fun:
 
         reply_string = f"{player['username'].capitalize()} here's (an out-dated) image of Lux's sigils: https://prnt.sc/zs7CX4WjB8q8"
 
-        if request_source == "chat":
-            reply_data = {
-                "player": player["username"],
-                "command": "sigil_list",
-                "payload": reply_string,
-            }
+        reply_data = {
+            "player": player["username"],
+            "command": "sigil_list",
+            "payload": reply_string,
+        }
 
-            action = {
-                "target": "chat",
-                "action": "send",
-                "payload": reply_data,
-                "source": "chat",
-            }
+        send_action = Utils.gen_send_action(request_source, reply_data)
 
-            self.p_q.put(action)
+        if send_action:
+            self.p_q.put(send_action)
+        else:
+            print("fun_stuff error: Invalid source for send.")
