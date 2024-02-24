@@ -69,4 +69,4 @@ if __name__ == '__main__':
             case "fun":
                 primary_handler.fun.dispatch(action)
             case _:
-                print(action)
+                print(f"Invalid primary handler for: {action}")
