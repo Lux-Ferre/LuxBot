@@ -1,6 +1,7 @@
 from multiprocessing.queues import Queue
 
 from repo import Repo
+from utils import Utils
 
 
 class Chat:
@@ -53,6 +54,12 @@ class Chat:
                 "target_command": "better_calc",
                 "permission": 1,
                 "help_string": "Does basic arithmetical operations. [!luxbot:better_calc <expression>]",
+            },
+            "help": {
+                "target_module": None,
+                "target_command": None,
+                "permission": 0,
+                "help_string": "Replies with a list of chat commands or info on a specific command. [!luxbot:help <opt:command>]",
             },
         }
         self.p_q = p_q
@@ -152,5 +159,40 @@ class Chat:
         parsed_command = self.parse_luxbot_command(message["message"])
         message["parsed_command"] = parsed_command
 
-        self.dispatch(message)
+        if parsed_command["command"] == "help":
+            self.handle_help_command(message)
+        else:
+            self.dispatch(message)
+
+    def handle_help_command(self, message):
+        payload = message["parsed_command"]["payload"]
+        username = message["player"]["username"]
+
+        chat_commands = self.dispatch_map
+
+        if payload is None:
+            help_string = "Command List"
+            for com in chat_commands:
+                help_string += f" | {com}"
+        else:
+            error_reply = {
+                "help_string": f"Sorry {username}, {payload} is not a valid LuxBot command."
+            }
+
+            requested_command = chat_commands.get(payload, error_reply)
+
+            help_string = requested_command["help_string"]
+
+        reply_data = {
+            "player": username,
+            "command": "wiki",
+            "payload": help_string,
+        }
+
+        send_action = Utils.gen_send_action("chat", reply_data)
+
+        if send_action:
+            self.p_q.put(send_action)
+        else:
+            print("Chat help error: Invalid source for send.")
         
