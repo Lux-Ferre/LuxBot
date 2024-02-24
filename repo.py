@@ -122,6 +122,18 @@ class Repo:
 
         return pet_data
 
+    def permission_level(self, payload: dict):
+        player = payload["player"]
+
+        query = "SELECT level FROM permissions WHERE user=?"
+        params = (player,)
+
+        level = self.database.fetch_db(query, params, False)
+        if level is None:
+            return 0
+        else:
+            return level[0]
+
     def fetch_db(self, action: dict):
         return self.database.fetch_db(action["query"], action["params"], action["many"])
 
