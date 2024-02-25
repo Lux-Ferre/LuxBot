@@ -1,4 +1,5 @@
 from multiprocessing.queues import Queue
+from datetime import datetime, timedelta
 
 from repo import Repo
 from utils import Utils
@@ -64,6 +65,7 @@ class Chat:
         }
         self.p_q = p_q
         self.db = db
+        self.last_com_time = datetime.min
 
     def dispatch(self, message: dict):
         command = message["parsed_command"]["command"]
@@ -109,7 +111,11 @@ class Chat:
             self.send(action)
             return
 
-        parsed_message = self.parse_chat(action["payload"])
+        message = action["payload"]
+
+        parsed_message = self.parse_chat(message["payload"])
+
+        parsed_message["time"] = message["time"]
 
         if parsed_message["message"][0] == "!":
             if parsed_message["message"][:8].lower() == "!luxbot:":
@@ -158,6 +164,16 @@ class Chat:
     def handle_luxbot_command(self, message: dict):
         parsed_command = self.parse_luxbot_command(message["message"])
         message["parsed_command"] = parsed_command
+
+        cooldown_length = timedelta(minutes=1)
+        current_time = datetime.now()
+        elapsed_time = current_time - self.last_com_time
+
+        if message["player"]["perm_level"] < 1 and elapsed_time < cooldown_length:
+            print(f"{elapsed_time} < {cooldown_length}")
+            return
+
+        self.last_com_time = current_time
 
         req_perm = self.dispatch_map[parsed_command["command"]]["permission"]
 

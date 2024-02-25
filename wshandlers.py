@@ -38,7 +38,7 @@ class WSHandlers:
         action = {
             "target": "chat",
             "action": "handle",
-            "payload": message["payload"],
+            "payload": message,
             "source": "chat",
         }
 

@@ -112,9 +112,12 @@ class Game:
         if len(split_message) > 1:
             payload = split_message[1]
 
+        current_time = datetime.now()
+
         message_data = {
             "type": split_message[0],
             "payload": payload,
+            "time": current_time,
         }
 
         action = {
