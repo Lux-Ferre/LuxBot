@@ -26,6 +26,9 @@ class Fun:
             "pet_stats": {
                 "target": self.pet_stats
             },
+            "update_pets": {
+                "target": self.update_pets
+            },
             "import_command": {
                 "target": self.import_command
             },
@@ -136,6 +139,25 @@ class Fun:
             self.p_q.put(send_action)
         else:
             print("fun_stuff error: Invalid source for send.")
+
+    def update_pets(self, action: dict):
+        command = action["payload"]
+        player = command["player"]["username"]
+        content = command["payload"]
+        split_sub_command = content.split(";")
+        if len(split_sub_command) != 4:
+            print(f"Interactor:Response:Invalid syntax. (pets:add;pet;title;link)")
+        else:
+            subcommand = split_sub_command[0]
+            pet = split_sub_command[1]
+            title = split_sub_command[2]
+            link = split_sub_command[3]
+
+            pet_data = (title, pet, link)
+
+            if subcommand == "add":
+                self.db.add_pet(pet_data)
+                print(f"{pet} link added with title: {title}")
     # End pet link stuff
 
     def dho_maps(self, action: dict):
