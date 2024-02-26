@@ -46,6 +46,7 @@ class Fun:
 
         target_dict["target"](action)
 
+    # Pet link stuff
     def get_pet_link(self, action: dict):
         message = action["payload"]
         parsed_command = message["parsed_command"]
@@ -102,6 +103,41 @@ class Fun:
         else:
             print("fun_stuff error: Invalid source for send.")
 
+    def pet_stats(self, action: dict):
+        message = action["payload"]
+        player = message["player"]
+        request_source = action["source"]
+
+        all_stats = self.db.get_pet_stats()
+
+        output_string = ""
+
+        for stat in all_stats:
+            pet, title_string = stat
+            titles = title_string.split(",")
+            title_count = len(titles)
+            output_string += f"{pet.capitalize()}({title_count}):\n"
+            for title in titles:
+                output_string += f"\t{title.capitalize()}\n"
+
+        pastebin_url = Utils.dump_to_pastebin(output_string, "10M")
+
+        reply_string = f"{pastebin_url}"
+
+        reply_data = {
+            "player": player["username"],
+            "command": "pet_stats",
+            "payload": reply_string,
+        }
+
+        send_action = Utils.gen_send_action(request_source, reply_data)
+
+        if send_action:
+            self.p_q.put(send_action)
+        else:
+            print("fun_stuff error: Invalid source for send.")
+    # End pet link stuff
+
     def dho_maps(self, action: dict):
         message = action["payload"]
         player = message["player"]
@@ -137,40 +173,6 @@ class Fun:
         reply_data = {
             "player": player["username"],
             "command": "wiki",
-            "payload": reply_string,
-        }
-
-        send_action = Utils.gen_send_action(request_source, reply_data)
-
-        if send_action:
-            self.p_q.put(send_action)
-        else:
-            print("fun_stuff error: Invalid source for send.")
-
-    def pet_stats(self, action: dict):
-        message = action["payload"]
-        player = message["player"]
-        request_source = action["source"]
-
-        all_stats = self.db.get_pet_stats()
-
-        output_string = ""
-
-        for stat in all_stats:
-            pet, title_string = stat
-            titles = title_string.split(",")
-            title_count = len(titles)
-            output_string += f"{pet.capitalize()}({title_count}):\n"
-            for title in titles:
-                output_string += f"\t{title.capitalize()}\n"
-
-        pastebin_url = Utils.dump_to_pastebin(output_string, "10M")
-
-        reply_string = f"{pastebin_url}"
-
-        reply_data = {
-            "player": player["username"],
-            "command": "pet_stats",
             "payload": reply_string,
         }
 
