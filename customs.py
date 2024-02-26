@@ -79,6 +79,12 @@ class Customs:
                 "permission": 3,
                 "help_string": "",
             },
+            "help": {
+                "target_module": None,
+                "target_command": None,
+                "permission": 3,
+                "help_string": "",
+            },
         }
         self.p_q = p_q
         self.db = db
@@ -178,7 +184,7 @@ class Customs:
             case "relay":
                 self.relay(message)
             case "help":
-                pass
+                self.handle_help_command(message)
             case _:
                 self.dispatch(message)
 
@@ -252,3 +258,35 @@ class Customs:
         send_action = Utils.gen_send_action("custom", reply_data)
 
         self.p_q.put(send_action)
+
+    def handle_help_command(self, message):
+        payload = message["payload"]
+        player = message["player"]
+
+        custom_commands = self.dispatch_map
+
+        if payload is None or payload.lower() == "none":
+            help_string = "Command List"
+            for com in custom_commands:
+                help_string += f" | {com}"
+        else:
+            error_reply = {
+                "help_string": f"Sorry {player['username']}, {payload} is not a valid LuxBot command."
+            }
+
+            requested_command = custom_commands.get(payload, error_reply)
+
+            help_string = requested_command["help_string"]
+
+        reply_data = {
+            "player": player,
+            "command": "help",
+            "payload": help_string,
+        }
+
+        send_action = Utils.gen_send_action("custom", reply_data)
+
+        if send_action:
+            self.p_q.put(send_action)
+        else:
+            print("Custom help error: Invalid source for send.")
