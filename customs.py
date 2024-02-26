@@ -73,6 +73,12 @@ class Customs:
                 "permission": 3,
                 "help_string": "",
             },
+            "relay": {
+                "target_module": None,
+                "target_command": None,
+                "permission": 3,
+                "help_string": "",
+            },
         }
         self.p_q = p_q
         self.db = db
@@ -170,7 +176,7 @@ class Customs:
             case "echo":
                 self.echo(message)
             case "relay":
-                pass
+                self.relay(message)
             case "help":
                 pass
             case _:
@@ -225,6 +231,22 @@ class Customs:
             "player": custom_data["player"],
             "command": "Echo",
             "payload": custom_data["payload"],
+        }
+
+        send_action = Utils.gen_send_action("custom", reply_data)
+
+        self.p_q.put(send_action)
+
+    def relay(self, custom_data: dict):
+        split_data = custom_data["payload"].split(";", maxsplit=1)
+        if len(split_data) != 2:
+            print(f"Invalid relay command: {custom_data}")
+            return
+
+        reply_data = {
+            "player": {"username": split_data[0]},
+            "command": "Relay",
+            "payload": split_data[1],
         }
 
         send_action = Utils.gen_send_action("custom", reply_data)
