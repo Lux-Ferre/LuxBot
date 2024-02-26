@@ -48,10 +48,7 @@ class Repo:
 
         self.database.set_db(query, params)
 
-    def add_pet(self, action: dict):
-        payload = action["payload"]
-        pet_data = payload["pet_data"]
-
+    def add_pet(self, pet_data: tuple):
         query = "INSERT INTO pet_links VALUES (?, ?, ?)"
 
         try:
