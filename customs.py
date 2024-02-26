@@ -11,79 +11,85 @@ class Customs:
                 "target_module": "mod",
                 "target_command": "update_triggers",
                 "permission": 3,
-                "help_string": "",
+                "help_string": "Add/remove automod triggers. [triggers:add/remove;<trigger>]",
             },
             "speak": {
                 "target_module": "",
                 "target_command": "",
                 "permission": 3,
-                "help_string": "",
+                "help_string": "Sends a chat message [speak:<message>]",
             },
             "pets": {
                 "target_module": "fun",
                 "target_command": "update_pets",
                 "permission": 3,
-                "help_string": "",
+                "help_string": "Interacts with the pets database [pets:add;<pet>;<title>;<link>]",
+            },
+            "pet_title": {
+                "target_module": "fun",
+                "target_command": "get_pet_link_by_title",
+                "permission": 0,
+                "help_string": "Replies with a specific photo from the pets database. [pet_title:<title>]",
             },
             "update_cheaters": {
                 "target_module": "admin",
                 "target_command": "update_cheaters",
                 "permission": 3,
-                "help_string": "",
+                "help_string": "Updates cheater permission levels from Nades's list. [update_cheaters:*]",
             },
             "permissions": {
                 "target_module": "admin",
                 "target_command": "update_permissions",
                 "permission": 3,
-                "help_string": "",
+                "help_string": "Modifies player permissions. [permissions:<player>:<level>]",
             },
             "mute": {
                 "target_module": "mod",
                 "target_command": "mute",
                 "permission": 3,
-                "help_string": "",
+                "help_string": "Mutes target player. [mute:<player>;<reason>;<length>;<is_ip>]",
             },
             "whois": {
                 "target_module": "mod",
                 "target_command": "whois",
                 "permission": 3,
-                "help_string": "",
+                "help_string": "Runs a whois check on <player>, sending the result to all level 3 accounts. [whois:<player>]",
             },
             "addstat": {
                 "target_module": "admin",
                 "target_command": "add_stat",
                 "permission": 3,
-                "help_string": "",
+                "help_string": "Adds a new datapoint to the chat_stats stored in the database. [addstat:<datapoint_name>]",
             },
             "generic": {
                 "target_module": "admin",
                 "target_command": "generic_ws",
                 "permission": 3,
-                "help_string": "",
+                "help_string": "Relays content as a websocket frame. [generic:<ws_message>]",
             },
             "close": {
                 "target_module": "admin",
                 "target_command": "close_connection",
                 "permission": 3,
-                "help_string": "",
+                "help_string": "Closes websocket connection. [close:close/restart]",
             },
             "echo": {
                 "target_module": None,
                 "target_command": None,
                 "permission": 3,
-                "help_string": "",
+                "help_string": "Repeats the message back to the sender. [echo:<message>]",
             },
             "relay": {
                 "target_module": None,
                 "target_command": None,
                 "permission": 3,
-                "help_string": "",
+                "help_string": "Passes the message on to another player. [relay:<player>;<message>]",
             },
             "help": {
                 "target_module": None,
                 "target_command": None,
                 "permission": 3,
-                "help_string": "",
+                "help_string": "Lists commands(with 'none', or gives a description of a command. [help:none/<command>]",
             },
         }
         self.p_q = p_q
@@ -96,11 +102,24 @@ class Customs:
             print(f"Custom message dispatch error: No handler for {parsed_custom['command']}")
             return
 
+        new_payload = {
+            "player": parsed_custom["player"],
+            "parsed_command": {
+                'callback_id': parsed_custom["callback_id"],
+                'plugin': parsed_custom["plugin"],
+                'command': parsed_custom["command"],
+                'payload': parsed_custom["payload"],
+                'anwin_formatted': parsed_custom["anwin_formatted"],
+                'player_offline': parsed_custom["player_offline"],
+            },
+
+        }
+
         new_action = {
             "target": dispatch_target["target_module"],
             "action": dispatch_target["target_command"],
-            "payload": parsed_custom,
-            "source": "chat",
+            "payload": new_payload,
+            "source": "custom",
         }
 
         self.p_q.put(new_action)
@@ -197,7 +216,7 @@ class Customs:
         payload = custom_data.get("payload", "N/A")
 
         if player and command:
-            custom_message = f"CUSTOM={player['username']}~{callback_id}:{plugin}:{command}:{payload}"
+            custom_message = f"CUSTOM={player}~{callback_id}:{plugin}:{command}:{payload}"
 
             action = {
                 "target": "game",
@@ -234,7 +253,7 @@ class Customs:
 
     def echo(self, custom_data: dict):
         reply_data = {
-            "player": custom_data["player"],
+            "player": custom_data["player"]["username"],
             "command": "Echo",
             "payload": custom_data["payload"],
         }
@@ -250,7 +269,7 @@ class Customs:
             return
 
         reply_data = {
-            "player": {"username": split_data[0]},
+            "player": split_data[0],
             "command": "Relay",
             "payload": split_data[1],
         }
@@ -279,7 +298,7 @@ class Customs:
             help_string = requested_command["help_string"]
 
         reply_data = {
-            "player": player,
+            "player": player["username"],
             "command": "help",
             "payload": help_string,
         }
