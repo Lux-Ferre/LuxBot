@@ -63,7 +63,7 @@ if __name__ == '__main__':
             case "game":
                 game_queue.put(action)
             case "custom":
-                primary_handler.customs.dispatch(action)
+                primary_handler.customs.handle(action)
             case "chat":
                 primary_handler.chat.handle(action)
             case "fun":

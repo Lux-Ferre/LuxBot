@@ -1,50 +1,99 @@
 from multiprocessing.queues import Queue
 
 from repo import Repo
+from utils import Utils
 
 
 class Customs:
     def __init__(self, p_q: Queue, db: Repo):
         self.dispatch_map = {
-            "send": {
-                "target": self.send,
+            "triggers": {
+                "target_module": "mod",
+                "target_command": "update_triggers",
+                "permission": 3,
+                "help_string": "",
+            },
+            "speak": {
+                "target_module": "",
+                "target_command": "",
+                "permission": 3,
+                "help_string": "",
+            },
+            "pets": {
+                "target_module": "fun",
+                "target_command": "update_pets",
+                "permission": 3,
+                "help_string": "",
+            },
+            "update_cheaters": {
+                "target_module": "admin",
+                "target_command": "update_cheaters",
+                "permission": 3,
+                "help_string": "",
+            },
+            "permissions": {
+                "target_module": "admin",
+                "target_command": "update_permissions",
+                "permission": 3,
+                "help_string": "",
+            },
+            "mute": {
+                "target_module": "mod",
+                "target_command": "mute",
+                "permission": 3,
+                "help_string": "",
+            },
+            "whois": {
+                "target_module": "mod",
+                "target_command": "whois",
+                "permission": 3,
+                "help_string": "",
+            },
+            "addstat": {
+                "target_module": "admin",
+                "target_command": "add_stat",
+                "permission": 3,
+                "help_string": "",
+            },
+            "generic": {
+                "target_module": "admin",
+                "target_command": "generic_ws",
+                "permission": 3,
+                "help_string": "",
             },
             "close": {
-                "target": self.close,
-            },
-            "print_items": {
-                "target": self.print_items,
+                "target_module": "admin",
+                "target_command": "close_connection",
+                "permission": 3,
+                "help_string": "",
             },
             "echo": {
-                "target": self.echo,
+                "target_module": None,
+                "target_command": None,
+                "permission": 3,
+                "help_string": "",
             },
-            "print_pets": {
-                "target": self.print_pets
-            }
         }
         self.p_q = p_q
         self.db = db
 
-    def dispatch(self, action: dict):
-        if action["action"] == "send":
-            self.send(action["payload"])
-            return
+    def dispatch(self, parsed_custom: dict):
+        dispatch_target = self.dispatch_map.get(parsed_custom["command"], None)
 
-        message = action["payload"]
-        parsed_custom = self.parse(message["payload"])
-        if parsed_custom["player"] != "a spider":
-            print(f"{parsed_custom['player']} does not have access to customs.")
-            return
-
-        message_target = self.dispatch_map.get(parsed_custom["command"], None)
-
-        if message_target is None:
+        if dispatch_target is None:
             print(f"Custom message dispatch error: No handler for {parsed_custom['command']}")
             return
 
-        message_target["target"](parsed_custom)
+        new_action = {
+            "target": dispatch_target["target_module"],
+            "action": dispatch_target["target_command"],
+            "payload": parsed_custom,
+            "source": "chat",
+        }
 
-    def parse(self, raw_custom: str) -> dict:
+        self.p_q.put(new_action)
+
+    def parse_custom(self, raw_custom: str) -> dict:
         custom_data = {
             "player": None,
             "callback_id": None,
@@ -52,6 +101,7 @@ class Customs:
             "command": None,
             "payload": None,
             "anwin_formatted": False,
+            "player_offline": False
         }
         player, data_string = raw_custom.split("~", 1)
 
@@ -59,9 +109,10 @@ class Customs:
 
         if data_string == "PLAYER_OFFLINE":
             custom_data["payload"] = data_string
+            custom_data["player_offline"] = True
             return custom_data
 
-        split_data = raw_custom.split(":", 3)
+        split_data = data_string.split(":", 3)
 
         if len(split_data) >= 4:
             custom_data["callback_id"] = split_data[0]
@@ -74,7 +125,59 @@ class Customs:
 
         return custom_data
 
-    def send(self, custom_data: dict):
+    def handle(self, action: dict):
+        if action["action"] == "send":
+            self.send(action)
+            return
+
+        message = action["payload"]
+
+        parsed_message = self.parse_custom(message["payload"])
+
+        parsed_message["time"] = message["time"]
+        player = parsed_message["player"]
+
+        parsed_message["player"] = {
+            "username": player,
+            "perm_level": self.db.permission_level({"player": player})
+        }
+
+        if parsed_message["anwin_formatted"]:
+            if parsed_message["plugin"] == "interactor":
+                self.handle_luxbot_command(parsed_message)
+        else:
+            if parsed_message["player_offline"]:
+                print(f"Player offline: {player}")
+            else:
+                print(f"Invalid custom, not Anwin Standard: {parsed_message}")
+
+        print(parsed_message)
+
+    def handle_luxbot_command(self, message: dict):
+        player_perm = message["player"]["perm_level"]
+        dispatch_data = self.dispatch_map.get(message["command"], None)
+        if not dispatch_data:
+            print(f"Custom error: Command '{message['command']}' does not exist!")
+            return
+
+        req_perm = self.dispatch_map[message["command"]]["permission"]
+
+        if player_perm < req_perm:
+            print(f"{message['player']['username']}[{player_perm}] attempted custom {message['command']}[{req_perm}]!")
+            return
+
+        match message["command"]:
+            case "echo":
+                self.echo(message)
+            case "relay":
+                pass
+            case "help":
+                pass
+            case _:
+                self.dispatch(message)
+
+    def send(self, action: dict):
+        custom_data = action["payload"]
         player = custom_data.get("player", None)
         callback_id = custom_data.get("callback_id", "IPP0")
         plugin = custom_data.get("plugin", "LuxBot")
@@ -82,7 +185,7 @@ class Customs:
         payload = custom_data.get("payload", "N/A")
 
         if player and command:
-            custom_message = f"CUSTOM={player}~{callback_id}:{plugin}:{command}:{payload}"
+            custom_message = f"CUSTOM={player['username']}~{callback_id}:{plugin}:{command}:{payload}"
 
             action = {
                 "target": "game",
@@ -117,23 +220,6 @@ class Customs:
         if action:
             self.p_q.put(action)
 
-    def print_items(self, custom_data: dict):
-        action = {
-            "target": "game",
-            "action": "print_items",
-            "payload": "",
-            "source": "custom",
-        }
-
-        self.p_q.put(action)
-
-    def print_pets(self, custom_data: dict):
-        pet_name = custom_data["payload"]
-
-        pet_links = self.db.get_pet_links({"pet": pet_name})
-
-        print(pet_links)
-
     def echo(self, custom_data: dict):
         reply_data = {
             "player": custom_data["player"],
@@ -141,11 +227,6 @@ class Customs:
             "payload": custom_data["payload"],
         }
 
-        action = {
-            "target": "custom",
-            "action": "send",
-            "payload": reply_data,
-            "source": "custom",
-        }
+        send_action = Utils.gen_send_action("custom", reply_data)
 
-        self.p_q.put(action)
+        self.p_q.put(send_action)
