@@ -207,7 +207,7 @@ class Chat:
 
         reply_data = {
             "player": username,
-            "command": "wiki",
+            "command": "help",
             "payload": help_string,
         }
 
