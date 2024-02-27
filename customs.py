@@ -33,6 +33,12 @@ class Customs:
                 "permission": 0,
                 "help_string": "Replies with a specific photo from the pets database. [pet_title:<title>]",
             },
+            "amy_noobs": {
+                "target_module": "stats",
+                "target_command": "amy_noobs",
+                "permission": 0,
+                "help_string": "Replies with some stats on how often Amy says 'noob. [amy_noobs:*]",
+            },
             "update_cheaters": {
                 "target_module": "admin",
                 "target_command": "update_cheaters",
