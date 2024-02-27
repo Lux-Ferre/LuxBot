@@ -241,27 +241,6 @@ class Customs:
             print("Invalid custom send:")
             print(custom_data)
 
-    def close(self, custom_data: dict):
-        if custom_data["payload"] == "close":
-            action = {
-                "target": "main",
-                "action": "main_close",
-                "payload": "",
-                "source": "custom",
-            }
-        elif custom_data["payload"] == "restart":
-            action = {
-                "target": "main",
-                "action": "main_restart",
-                "payload": "",
-                "source": "custom",
-            }
-        else:
-            action = None
-
-        if action:
-            self.p_q.put(action)
-
     def echo(self, custom_data: dict):
         reply_data = {
             "player": custom_data["player"]["username"],

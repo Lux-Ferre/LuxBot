@@ -27,8 +27,8 @@ class Admin:
             "generic": {
                 "target": self.generic
             },
-            "close": {
-                "target": self.close
+            "close_connection": {
+                "target": self.close_connection
             },
         }
 
@@ -133,5 +133,29 @@ class Admin:
 
         self.p_q.put(action)
 
-    def close(self, action: dict):
-        pass
+    def close_connection(self, action: dict):
+        # {'payload': {'player': {'username': '', 'perm_level': 3}, 'parsed_command': {}}}
+        message = action["payload"]
+        parsed_command = message["parsed_command"]
+        payload = parsed_command["payload"]
+        message_source = action["source"]
+
+        if payload == "close":
+            action = {
+                "target": "main",
+                "action": "main_close",
+                "payload": "",
+                "source": message_source,
+            }
+        elif payload == "restart":
+            action = {
+                "target": "main",
+                "action": "main_restart",
+                "payload": "",
+                "source": message_source,
+            }
+        else:
+            action = None
+
+        if action:
+            self.p_q.put(action)
