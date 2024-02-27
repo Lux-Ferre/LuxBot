@@ -71,9 +71,8 @@ class Repo:
         params = (updated_player, level)
         self.database.set_db(query, params)
 
-    def set_cheaters_permissions(self, action: dict):
-        payload = action["payload"]
-        player_list = payload["player_list"]
+    def set_cheaters_permissions(self, payload: dict):
+        cheater_list = payload["cheater_list"]
 
         cur = self.database.con.cursor()
 
@@ -81,8 +80,8 @@ class Repo:
                         INSERT INTO permissions(user, level) VALUES(?1, ?2)
                         ON CONFLICT(user) DO UPDATE SET level=?2
                     """
-        for player in player_list:
-            params = (player, -2)
+        for cheater in cheater_list:
+            params = (cheater, -2)
             cur.execute(query, params)
 
         self.database.con.commit()

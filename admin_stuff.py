@@ -1,4 +1,5 @@
-import re
+import requests
+import json
 
 from multiprocessing.queues import Queue
 
@@ -62,7 +63,15 @@ class Admin:
             print("admin_stuff error: Invalid source for send.")
 
     def update_cheaters(self, action: dict):
-        pass
+        url = 'https://raw.githubusercontent.com/GodofNades/idle-pixel/main/AltTraders.json'
+        resp = requests.get(url)
+        data = json.loads(resp.text)
+
+        cheater_list = []
+        for data_point in data:
+            cheater_list.append(data_point["name"])
+
+        self.db.set_cheaters_permissions({"cheater_list": cheater_list})
 
     def permissions(self, action: dict):
         pass
