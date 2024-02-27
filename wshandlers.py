@@ -25,6 +25,9 @@ class WSHandlers:
                 },
                 "OPEN_DIALOGUE": {
                     "target": self.on_dialogue
+                },
+                "VALID_LOGIN": {
+                    "target": self.on_valid_login
                 }
             }
 
@@ -110,3 +113,7 @@ class WSHandlers:
             self.p_q.put(action)
         else:
             print(f"DIALOGUE: {data}")
+
+    @staticmethod
+    def on_valid_login(message: dict):
+        print("Signature verified. Login Successful.")
