@@ -35,6 +35,11 @@ class WSHandlers:
         message = action["payload"]
         message_type = message["type"]
 
+        ignored_types = ["SET_COUNTRY"]
+
+        if message_type in ignored_types:
+            return
+
         message_target = self.dispatch_map.get(message_type, None)
 
         if message_target is None:
