@@ -56,6 +56,12 @@ class Chat:
                 "permission": 1,
                 "help_string": "Does basic arithmetical operations. [!luxbot:better_calc <expression>]",
             },
+            "chat_stats": {
+                "target_module": "stats",
+                "target_command": "get_all_stats",
+                "permission": 0,
+                "help_string": "Replies with a pastebin link containing various chat statistics. [!luxbot:chat_stats]",
+            },
             "help": {
                 "target_module": None,
                 "target_command": None,
