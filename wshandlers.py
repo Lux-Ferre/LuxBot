@@ -125,6 +125,10 @@ class WSHandlers:
             }
 
             self.p_q.put(action)
+        elif data[:12] == "OFFLINE TIME":
+            start = data.index("for:") + 13
+            end = data.index("</b>", start)
+            print(f"Offline time: {data[start:end]}")
         else:
             print(f"DIALOGUE: {data}")
 
