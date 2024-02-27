@@ -96,10 +96,42 @@ class Admin:
         self.db.update_permission(update_data)
 
     def add_stat(self, action: dict):
-        pass
+        # {'payload': {'player': {'username': '', 'perm_level': 3}, 'parsed_command': {}}}
+        message = action["payload"]
+        parsed_command = message["parsed_command"]
+        player = message["player"]
+
+        new_stat = parsed_command["payload"]
+
+        current_stats = self.db.read_config_row({"key": "chat_stats"})
+        if new_stat in current_stats:
+            print(f"The value {new_stat} already exists!")
+            return
+
+        current_stats[new_stat] = 0
+
+        update_data = {
+            "key": "chat_stats",
+            "value": current_stats
+        }
+        self.db.set_config_row(update_data)
 
     def generic(self, action: dict):
-        pass
+        # {'payload': {'player': {'username': '', 'perm_level': 3}, 'parsed_command': {}}}
+        message = action["payload"]
+        parsed_command = message["parsed_command"]
+        message_source = action["source"]
+
+        ws_message = parsed_command["payload"]
+
+        action = {
+            "target": "game",
+            "action": "send_ws_message",
+            "payload": ws_message,
+            "source": message_source,
+        }
+
+        self.p_q.put(action)
 
     def close(self, action: dict):
         pass
