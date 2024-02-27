@@ -18,14 +18,11 @@ class Stats:
             "handle_yell": {
                 "target": self.handle_yell
             },
-            "get_specific_stat": {
-                "target": self.get_specific_stat
-            },
             "get_all_stats": {
                 "target": self.get_all_stats
             },
-            "get_amy_stats": {
-                "target": self.get_amy_stats
+            "amy_noobs": {
+                "target": self.get_amy_noobs
             },
             "get_one_life_stats": {
                 "target": self.get_one_life_stats
@@ -371,14 +368,39 @@ class Stats:
 
             self.p_q.put(send_action)
 
-    def get_specific_stat(self, action: dict):
-        pass
-
     def get_all_stats(self, action: dict):
         pass
 
-    def get_amy_stats(self, action: dict):
-        pass
+    def get_amy_noobs(self, action: dict):
+        player = action["payload"]["player"]
+        request_source = action["source"]
+        chat_stats = self.db.read_config_row({"key": "chat_stats"})
+
+        start_date = chat_stats["start_date"]
+        start_datetime = datetime.strptime(start_date, "%d/%m/%y %H:%M")
+        delta = datetime.now() - start_datetime
+        total_time = round(delta.total_seconds())
+
+        amy_noobs = self.__per_time(total_time, chat_stats["amy_noobs"])
+        amy_total = chat_stats["amy_total"]
+        total_noobs = chat_stats["total_noobs"]
+
+        noobs_per_amy = round((amy_noobs[0] / amy_total) * 100)
+        noobs_per_total = round((amy_noobs[0] / total_noobs) * 100)
+        reply_string = f"Since {start_date}, Amy has said noob {amy_noobs[0]} times. That's {round(amy_noobs[1])} times per day; making up {noobs_per_amy}% of her messages, and {noobs_per_total}% of the times noob is said in chat."
+
+        reply_data = {
+            "player": player["username"],
+            "command": "amy_noobs",
+            "payload": reply_string,
+        }
+
+        send_action = Utils.gen_send_action(request_source, reply_data)
+
+        if send_action:
+            self.p_q.put(send_action)
+        else:
+            print("stats_stuff error: Invalid source for send.")
 
     def get_one_life_stats(self, action: dict):
         pass
