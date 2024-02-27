@@ -39,6 +39,12 @@ class Customs:
                 "permission": 0,
                 "help_string": "Replies with some stats on how often Amy says 'noob. [amy_noobs:*]",
             },
+            "chat_stats": {
+                "target_module": "stats",
+                "target_command": "get_all_stats",
+                "permission": 0,
+                "help_string": "Replies with a pastebin link containing various chat statistics. [!luxbot:chat_stats:*]",
+            },
             "update_cheaters": {
                 "target_module": "admin",
                 "target_command": "update_cheaters",
