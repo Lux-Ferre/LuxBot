@@ -14,6 +14,9 @@ class WSHandlers:
                 "CHAT": {
                     "target": self.on_chat,
                 },
+                "YELL": {
+                    "target": self.on_yell,
+                },
                 "CUSTOM": {
                     "target": self.on_custom,
                 },
@@ -43,6 +46,16 @@ class WSHandlers:
             "action": "handle",
             "payload": message,
             "source": "chat",
+        }
+
+        self.p_q.put(action)
+
+    def on_yell(self, message: dict):
+        action = {
+            "target": "stats",
+            "action": "handle_yell",
+            "payload": message,
+            "source": "ws_handlers",
         }
 
         self.p_q.put(action)
