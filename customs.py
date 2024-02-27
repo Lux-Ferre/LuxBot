@@ -16,8 +16,8 @@ class Customs:
                 "help_string": "Add/remove automod triggers. [triggers:add/remove;<trigger>]",
             },
             "speak": {
-                "target_module": "",
-                "target_command": "",
+                "target_module": "admin",
+                "target_command": "speak",
                 "permission": 3,
                 "help_string": "Sends a chat message [speak:<message>]",
             },

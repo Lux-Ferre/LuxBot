@@ -8,6 +8,7 @@ from chat import Chat
 from repo import Repo
 from fun_stuff import Fun
 from mod_stuff import Mod
+from admin_stuff import Admin
 
 
 class PrimaryHandler:
@@ -20,6 +21,7 @@ class PrimaryHandler:
         self.chat = Chat(self.p_q, self.db)
         self.fun = Fun(self.p_q, self.db)
         self.mod = Mod(self.p_q, self.db)
+        self.admin = Admin(self.p_q, self.db)
 
         self.ws_handlers.apply_dispatch_map()
 
@@ -72,5 +74,7 @@ if __name__ == '__main__':
                 primary_handler.fun.dispatch(action)
             case "mod":
                 primary_handler.mod.dispatch(action)
+            case "admin":
+                primary_handler.admin.dispatch(action)
             case _:
                 print(f"Invalid primary handler for: {action}")
