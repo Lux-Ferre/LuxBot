@@ -217,7 +217,7 @@ class Customs:
         command = custom_data.get("command", None)
         payload = custom_data.get("payload", "N/A")
 
-        leading_data = f"CUSTOM={player}~{callback_id}:{plugin}:{command}:"
+        leading_data = f"CUSTOM={player}~{callback_id}:{plugin}:{command}"
 
         payload_max_length = 120 - len(leading_data)
 
