@@ -62,6 +62,12 @@ class Chat:
                 "permission": 0,
                 "help_string": "Replies with a pastebin link containing various chat statistics. [!luxbot:chat_stats]",
             },
+            "one_life": {
+                "target_module": "stats",
+                "target_command": "get_one_life_stats",
+                "permission": 0,
+                "help_string": "Replies with a pastebin link containing one life statistics. [!luxbot:one_life:<area|kills>]",
+            },
             "help": {
                 "target_module": None,
                 "target_command": None,
