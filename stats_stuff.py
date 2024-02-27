@@ -1,6 +1,7 @@
-import re
+import random
 
 from multiprocessing.queues import Queue
+from datetime import datetime
 
 from repo import Repo
 from utils import Utils
@@ -78,9 +79,6 @@ class Stats:
         if yell_type == "one_life_death":
             self.update_one_life(yell_text)
 
-    def handle_dynamic_command(self, action: dict):
-        pass
-
     @staticmethod
     def get_yell_type(message: str) -> str:
         if "found a diamond" in message:
@@ -105,6 +103,141 @@ class Stats:
             yell_type = "unknown"
 
         return yell_type
+
+    def handle_dynamic_command(self, message_data: dict):
+        message_text = message_data["message"]
+        player = message_data["player"]
+
+        if player["perm_level"] < 0:
+            print(f"{player['username']}[{player['perm_level']} attempted to use dynamic command.")
+            return
+
+        if message_text[0] == "!":
+            return
+
+        dynamic_command_triggers = ["chat stat", "gimme", "fetch", "look up", "statistic"]
+
+        trigger_found = False
+
+        if "luxbot" in message_text.lower():
+            for trigger in dynamic_command_triggers:
+                if trigger in message_text.lower():
+                    trigger_found = True
+
+        if not trigger_found:
+            return
+
+        required_value = self.get_dynamic_request_type(message_text)
+
+        if required_value is None:
+            return
+
+        if "day" in message_text:
+            time_frame = 1
+        elif "hour" in message_text:
+            time_frame = 2
+        else:
+            time_frame = 0
+
+        response = self.generate_dynamic_request_response(player["username"], required_value, time_frame)
+
+        print(response)
+
+    @staticmethod
+    def get_dynamic_request_type(message_text: str) -> str | None:
+        required_value = None
+
+        if "amy" in message_text:
+            if "suck" in message_text:
+                required_value = "amy_sucks"
+            elif "noob" in message_text:
+                required_value = "amy_noobs"
+            elif "spoken" in message_text or "messages" in message_text:
+                required_value = "amy_total"
+        elif "noob" in message_text:
+            required_value = "total_noobs"
+        elif "other bot" in message_text:
+            required_value = "botofnades_requests"
+        elif "blood diamond" in message_text:
+            required_value = "blood_diamonds_found"
+        elif "diamond" in message_text:
+            required_value = "diamonds_found"
+        elif "blood gem goblin" in message_text:
+            required_value = "blood_goblin_encounters"
+        elif "gem goblin" in message_text:
+            required_value = "gem_goblin_encounters"
+        elif "server message" in message_text:
+            required_value = "total_yells"
+        elif "elite" in message_text:
+            required_value = "elite_achievements"
+        elif "sigils" in message_text:
+            required_value = "sigils_found"
+        elif "asked you" in message_text:
+            required_value = "luxbot_requests"
+        elif "max" in message_text:
+            required_value = "max_levels"
+        elif "messages" in message_text:
+            required_value = "total_messages"
+        elif "playtime" in message_text:
+            required_value = "playtime"
+        elif "hevent" in message_text:
+            required_value = "hevent"
+        elif "zombo" in message_text:
+            required_value = "zombo"
+
+        return required_value
+
+    def generate_dynamic_request_response(self, player: str, required_value: str, time_frame: int) -> str:
+        chat_stats = self.db.read_config_row({"key": "chat_stats"})
+
+        if required_value == "playtime":
+            diamonds = chat_stats["diamonds_found"]
+            blood_diamonds = chat_stats["blood_diamonds_found"]
+
+            est_by_diamonds = (diamonds * 1000000) / 60 / 60
+            est_by_blood_diamonds = blood_diamonds * 25000000 / 60 / 60
+            requested_value = round((est_by_blood_diamonds + est_by_diamonds) / 2)
+        else:
+            requested_value = chat_stats[required_value]
+
+        if required_value == "hevent":
+            start_date = "23/10/23 17:00"
+        elif required_value == "zombo":
+            start_date = "25/10/23 11:00"
+        else:
+            start_date = chat_stats["start_date"]
+
+        start_datetime = datetime.strptime(start_date, "%d/%m/%y %H:%M")
+        delta = datetime.now() - start_datetime
+        total_time = round(delta.total_seconds())
+
+        request_per_time = self.__per_time(total_time, requested_value)
+
+        match time_frame:
+            case 1:
+                response_timeframe = "every day"
+            case 2:
+                response_timeframe = "every hour"
+            case _:
+                if required_value == "hevent":
+                    response_timeframe = "since 17:00 23/10/2023 BST"
+                elif required_value == "zombo":
+                    response_timeframe = "since 11:00 25/10/2023 BST"
+                else:
+                    response_timeframe = "since 09/08/2023"
+
+        response_value = f"{request_per_time[time_frame]} {response_timeframe}"
+
+        response_patterns = [
+            f"Here's the number you wanted {player.capitalize()}: {response_value}. Get it yourself next time.",
+            f"Ugh. Fine. Here: {response_value}.",
+            f"You're so lazy! Here: {response_value}.",
+            f"-.- {response_value}",
+            f"*sigh* {response_value}",
+            f"Damn slave driver... {response_value}...",
+        ]
+
+        return random.choice(response_patterns)
 
     def update_stats_from_chat(self, message_data: dict):
         player = message_data["player"]
