@@ -369,7 +369,58 @@ class Stats:
             self.p_q.put(send_action)
 
     def get_all_stats(self, action: dict):
-        pass
+        player = action["payload"]["player"]
+        request_source = action["source"]
+
+        chat_stats = self.db.read_config_row({"key": "chat_stats"})
+        start_date = chat_stats["start_date"]
+
+        start_datetime = datetime.strptime(start_date, "%d/%m/%y %H:%M")
+
+        delta = datetime.now() - start_datetime
+        total_time = round(delta.total_seconds())
+
+        mapping = {
+            "chats": self.__per_time(total_time, chat_stats["total_messages"]),
+            "nades": self.__per_time(total_time, chat_stats["botofnades_requests"]),
+            "luxbot": self.__per_time(total_time, chat_stats["luxbot_requests"]),
+            "yells": self.__per_time(total_time, chat_stats["total_yells"]),
+            "diamonds": self.__per_time(total_time, chat_stats["diamonds_found"]),
+            "blood_diamonds": self.__per_time(total_time, chat_stats["blood_diamonds_found"]),
+            "sigils": self.__per_time(total_time, chat_stats["sigils_found"]),
+            "goblins": self.__per_time(total_time, chat_stats["gem_goblin_encounters"]),
+            "blood_goblins": self.__per_time(total_time, chat_stats["blood_goblin_encounters"]),
+            "elites": self.__per_time(total_time, chat_stats["elite_achievements"]),
+            "skills": self.__per_time(total_time, chat_stats["max_levels"]),
+            "golds": self.__per_time(total_time, chat_stats["gold_armour"]),
+            "wikibot": self.__per_time(total_time, chat_stats["wikibot"]),
+        }
+
+        with open("assets/chat_stats.template") as my_file:
+            template = my_file.read()
+
+        template = template.replace("{start_date}", str(start_date))
+
+        for key, value in mapping.items():
+            for i in range(3):
+                template = template.replace("{" + f"{key}[{i}]" + "}", str(value[i]))
+
+        pastebin_url = Utils.dump_to_pastebin(template, "10M")
+
+        reply_string = f"{player['username'].capitalize()}, here are the currently tracked stats: {pastebin_url}"
+
+        reply_data = {
+            "player": player["username"],
+            "command": "chat_stats",
+            "payload": reply_string,
+        }
+
+        send_action = Utils.gen_send_action(request_source, reply_data)
+
+        if send_action:
+            self.p_q.put(send_action)
+        else:
+            print("stats_stuff error: Invalid source for send.")
 
     def get_amy_noobs(self, action: dict):
         player = action["payload"]["player"]

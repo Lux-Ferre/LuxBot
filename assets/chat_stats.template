@@ -1,0 +1,30 @@
+Since {start_date} there have been:
+{chats[0]} chat messages sent!
+{nades[0]} BotofNades commands sent!
+{luxbot[0]} LuxBot commands sent!
+{wikibot[0]} WikiSearch bot requests made!
+{yells[0]} server messages sent!
+Those include:
+	- {golds[0]} gold armour pieces found!
+	- {diamonds[0]} diamonds found!
+	- {blood_diamonds[0]} blood diamonds found!
+	- {sigils[0]} monster sigils found!
+
+	- {goblins[0]} gem goblin encounters!
+	- {blood_goblins[0]} blood gem goblin encounters!
+
+	- {elites[0]} elite achievement sets completed!
+	- {skills[0]} skills reached the max level of 100!
+======================================================================================
+Every day that means:
+	- {chats[1]} chat messages and {yells[1]} server messages sent!
+	- {diamonds[1]} diamonds, {blood_diamonds[1]} blood diamonds, and {sigils[1]} monster sigils have been found!
+	- {goblins[1]} gem goblins, and {blood_goblins[1]} blood gem goblins have been fought!
+	- {elites[1]} elites and {skills[1]} skills have been completed!
+======================================================================================
+That works out to be:
+	- {chats[2]} chat messages and {yells[2]} server messages sent!
+	- {diamonds[2]} diamonds, {blood_diamonds[2]} blood diamonds, and {sigils[2]} monster sigils found!
+	- {goblins[2]} gem goblins, and {blood_goblins[2]} blood gem goblins fought!
+	- {elites[2]} elites and {skills[2]} skills completed!
+every hour!
