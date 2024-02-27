@@ -121,6 +121,15 @@ class Chat:
             if parsed_message["message"][:8].lower() == "!luxbot:":
                 self.handle_luxbot_command(parsed_message)
 
+        action = {
+            "target": "stats",
+            "action": "handle_chat",
+            "payload": parsed_message,
+            "source": "chat",
+        }
+
+        self.p_q.put(action)
+
         print(parsed_message)
 
     def send(self, action: dict):
