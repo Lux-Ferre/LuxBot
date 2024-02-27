@@ -18,8 +18,8 @@ class Admin:
             "update_cheaters": {
                 "target": self.update_cheaters
             },
-            "permissions": {
-                "target": self.permissions
+            "update_permissions": {
+                "target": self.update_permissions
             },
             "add_stat": {
                 "target": self.add_stat
@@ -73,8 +73,27 @@ class Admin:
 
         self.db.set_cheaters_permissions({"cheater_list": cheater_list})
 
-    def permissions(self, action: dict):
-        pass
+    def update_permissions(self, action: dict):
+        # {'payload': {'player': {'username': '', 'perm_level': 3}, 'parsed_command': {}}}
+        message = action["payload"]
+        parsed_command = message["parsed_command"]
+        player = message["player"]
+
+        content = parsed_command["payload"]
+        split_command = content.split(";")
+        if len(split_command) != 2:
+            print("Invalid syntax. Must be of form 'permissions:player;level'")
+            return
+
+        updated_player = split_command[0]
+        level = split_command[1]
+
+        update_data = {
+            "updated_player": updated_player,
+            "level": level
+        }
+
+        self.db.update_permission(update_data)
 
     def add_stat(self, action: dict):
         pass

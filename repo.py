@@ -54,14 +54,18 @@ class Repo:
         except sqlite3.IntegrityError as e:
             print(e)
 
-    def update_permission(self, action: dict):
-        payload = action["payload"]
+    def update_permission(self, payload: dict):
         updated_player = payload["updated_player"]
         level = payload["level"]
 
-        level = int(level)
+        try:
+            level = int(level)
+        except ValueError:
+            print("Permission level must be a number between -2 and 3")
+            return
 
         if not -2 <= level <= 3:
+            print("Invalid new permission level.")
             return
 
         query = """
