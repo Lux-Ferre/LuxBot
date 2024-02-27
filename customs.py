@@ -1,3 +1,5 @@
+import re
+
 from multiprocessing.queues import Queue
 
 from repo import Repo
@@ -215,17 +217,26 @@ class Customs:
         command = custom_data.get("command", None)
         payload = custom_data.get("payload", "N/A")
 
+        leading_data = f"CUSTOM={player}~{callback_id}:{plugin}:{command}:"
+
+        payload_max_length = 120 - len(leading_data)
+
+        print(payload)
+
+        paginated_payload = re.findall(".{1," + f"{payload_max_length}" + "}", payload)
+
         if player and command:
-            custom_message = f"CUSTOM={player}~{callback_id}:{plugin}:{command}:{payload}"
+            for page in paginated_payload:
+                custom_message = f"{leading_data}:{page}"
 
-            action = {
-                "target": "game",
-                "action": "send_ws_message",
-                "payload": custom_message,
-                "source": "custom",
-            }
+                action = {
+                    "target": "game",
+                    "action": "send_ws_message",
+                    "payload": custom_message,
+                    "source": "custom",
+                }
 
-            self.p_q.put(action)
+                self.p_q.put(action)
         else:
             print("Invalid custom send:")
             print(custom_data)

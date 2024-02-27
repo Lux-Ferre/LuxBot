@@ -85,10 +85,12 @@ class WSHandlers:
             cropped_data = data[15:]
             whois_list = cropped_data.split("<br />")[:-1]
 
+            whois_string = ",".join(whois_list)
+
             action = {
                 "target": "mod",
                 "action": "received_whois",
-                "payload": whois_list,
+                "payload": whois_string,
                 "source": "ws_handlers"
             }
 
