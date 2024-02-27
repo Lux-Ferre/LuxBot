@@ -9,6 +9,7 @@ from repo import Repo
 from fun_stuff import Fun
 from mod_stuff import Mod
 from admin_stuff import Admin
+from stats_stuff import Stats
 
 
 class PrimaryHandler:
@@ -22,6 +23,7 @@ class PrimaryHandler:
         self.fun = Fun(self.p_q, self.db)
         self.mod = Mod(self.p_q, self.db)
         self.admin = Admin(self.p_q, self.db)
+        self.stats = Stats(self.p_q, self.db)
 
         self.ws_handlers.apply_dispatch_map()
 
@@ -62,10 +64,10 @@ if __name__ == '__main__':
         match action["target"]:
             case "main":
                 primary_handler.dispatch(action)
-            case "ws_handlers":
-                primary_handler.ws_handlers.dispatch(action)
             case "game":
                 game_queue.put(action)
+            case "ws_handlers":
+                primary_handler.ws_handlers.dispatch(action)
             case "custom":
                 primary_handler.customs.handle(action)
             case "chat":
@@ -76,5 +78,7 @@ if __name__ == '__main__':
                 primary_handler.mod.dispatch(action)
             case "admin":
                 primary_handler.admin.dispatch(action)
+            case "stats":
+                primary_handler.stats.dispatch(action)
             case _:
                 print(f"Invalid primary handler for: {action}")
