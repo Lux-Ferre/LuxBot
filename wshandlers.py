@@ -20,6 +20,9 @@ class WSHandlers:
                 "SET_ITEMS": {
                     "target": self.on_set_items,
                 },
+                "OPEN_DIALOGUE": {
+                    "target": self.on_dialogue
+                }
             }
 
     def dispatch(self, action: dict):
@@ -75,3 +78,20 @@ class WSHandlers:
         }
 
         self.p_q.put(action)
+
+    def on_dialogue(self, message: dict):
+        data = message["payload"]
+        if data[:5] == "WHOIS":
+            cropped_data = data[15:]
+            whois_list = cropped_data.split("<br />")[:-1]
+
+            action = {
+                "target": "mod",
+                "action": "received_whois",
+                "payload": whois_list,
+                "source": "ws_handlers"
+            }
+
+            self.p_q.put(action)
+        else:
+            print(f"DIALOGUE: {data}")
