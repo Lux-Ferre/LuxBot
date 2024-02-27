@@ -76,7 +76,7 @@ class Stats:
         self.update_stats_from_yell(yell_type)
 
         if yell_type == "one_life_death":
-            self.update_one_life(yell_data)
+            self.update_one_life(yell_text)
 
     def handle_dynamic_command(self, action: dict):
         pass
@@ -208,8 +208,35 @@ class Stats:
         }
         self.db.set_config_row(update_data)
 
-    def update_one_life(self, action: dict):
-        pass
+    def update_one_life(self, yell_text: str):
+        mob_name = yell_text.split("died to a ")[1].split(" and lost")[0]
+
+        current_stats = self.db.read_config_row({"key": "one_life_killers"})
+
+        if mob_name not in current_stats:
+            current_stats[mob_name] = 1
+        else:
+            current_stats[mob_name] += 1
+
+        update_data = {
+            "key": "one_life_killers",
+            "value": current_stats
+        }
+        self.db.set_config_row(update_data)
+
+        if mob_name == "spider":
+            spider_kills = current_stats["spider"]
+
+            custom_data = {
+                "player": "a spider",
+                "plugin": "spiderTaunt",
+                "command": "spiderKill",
+                "payload": str(spider_kills),
+            }
+
+            send_action = Utils.gen_send_action("custom", custom_data)
+
+            self.p_q.put(send_action)
 
     def get_specific_stat(self, action: dict):
         pass
