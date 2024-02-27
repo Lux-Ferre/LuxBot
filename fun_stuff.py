@@ -38,6 +38,9 @@ class Fun:
             "better_calc": {
                 "target": self.better_calc
             },
+            "handle_yell": {
+                "target": self.handle_yell
+            },
         }
 
     def dispatch(self, action: dict):
@@ -315,6 +318,32 @@ class Fun:
         }
 
         send_action = Utils.gen_send_action(request_source, reply_data)
+
+        if send_action:
+            self.p_q.put(send_action)
+        else:
+            print("fun_stuff error: Invalid source for send.")
+
+    def handle_yell(self, action: dict):
+        message = action["payload"]["payload"]
+
+        reply_string = None
+
+        if "agrodon" in message.lower():
+            reply_string = "Wizard hax!"
+        elif "i am smitty" in message.lower():
+            reply_string = "Dev hax!"
+
+        if not reply_string:
+            return
+
+        reply_data = {
+            "player": "SERVER",
+            "command": "yell_joke",
+            "payload": reply_string,
+        }
+
+        send_action = Utils.gen_send_action("chat", reply_data)
 
         if send_action:
             self.p_q.put(send_action)

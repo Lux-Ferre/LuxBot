@@ -59,14 +59,23 @@ class WSHandlers:
         self.p_q.put(action)
 
     def on_yell(self, message: dict):
-        action = {
-            "target": "stats",
-            "action": "handle_yell",
-            "payload": message,
-            "source": "ws_handlers",
-        }
+        actions = [
+            {
+                "target": "stats",
+                "action": "handle_yell",
+                "payload": message,
+                "source": "ws_handlers",
+            },
+            {
+                "target": "fun",
+                "action": "handle_yell",
+                "payload": message,
+                "source": "ws_handlers",
+            },
+        ]
 
-        self.p_q.put(action)
+        for action in actions:
+            self.p_q.put(action)
 
     def on_custom(self, message: dict):
         action = {
