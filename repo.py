@@ -23,8 +23,7 @@ class Repo:
 
         return loaded_links
 
-    def read_config_row(self, action: dict) -> dict:
-        payload = action["payload"]
+    def read_config_row(self, payload: dict) -> dict:
         key = payload["key"]
 
         query = "SELECT data FROM configs WHERE config=?"
@@ -35,8 +34,7 @@ class Repo:
 
         return config_dict
 
-    def set_config_row(self, action: dict):
-        payload = action["payload"]
+    def set_config_row(self, payload: dict):
         key = payload["key"]
         value = payload["value"]
 

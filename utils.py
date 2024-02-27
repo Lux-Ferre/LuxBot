@@ -46,3 +46,16 @@ class Utils:
             }
 
         return send_action
+
+    @staticmethod
+    def gen_mute_action(target, length, reason, is_ip):
+        mute_data = f"MUTE={target}~{length}~{reason}~{is_ip}"
+
+        mute_action = {
+            "target": "game",
+            "action": "send_ws_message",
+            "payload": mute_data,
+            "source": "custom",
+        }
+
+        return mute_action
