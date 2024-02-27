@@ -1,4 +1,5 @@
 import random
+import json
 
 from multiprocessing.queues import Queue
 from datetime import datetime
@@ -454,4 +455,68 @@ class Stats:
             print("stats_stuff error: Invalid source for send.")
 
     def get_one_life_stats(self, action: dict):
-        pass
+        message = action["payload"]
+        parsed_command = message["parsed_command"]
+        player = message["player"]
+        request_source = action["source"]
+
+        sort_type = parsed_command["payload"]
+
+        if sort_type is None:
+            sort_type = "area"
+
+        with open("assets/mob_info.json") as json_file:
+            enemy_info = json.load(json_file)
+
+        one_life_total = self.db.read_config_row({"key": "chat_stats"})["oneLifeDeaths"]
+
+        one_life_killers = self.db.read_config_row({"key": "one_life_killers"})
+
+        for mob, kill_count in one_life_killers.items():
+            if mob in enemy_info:
+                enemy_info[mob]["kills"] = kill_count
+            else:
+                enemy_info[mob] = {
+                    "display": mob,
+                    "location": "Unknown",
+                    "kills": kill_count,
+                }
+
+        if sort_type == "kills":
+            new_enemy_info = {}
+            enemy_info_list = sorted(enemy_info.items(), key=lambda k_v: k_v[1]['kills'], reverse=True)
+            for data_point in enemy_info_list:
+                new_enemy_info[data_point[0]] = data_point[1]
+
+            enemy_info = new_enemy_info
+
+        display_string = f"""Total One-life deaths: {one_life_total}\n====================="""
+
+        if sort_type != "area":
+            display_string += "\n"
+
+        current_area = ""
+
+        for mob, data in enemy_info.items():
+            if data['location'] != current_area and sort_type == "area":
+                display_string += "\n"
+            current_area = data['location']
+            new_line = f"{data['location']} - {data['display']}: {data['kills']}\n"
+            display_string += new_line
+
+        pastebin_url = Utils.dump_to_pastebin(display_string, "10M")
+
+        reply_string = f"{player['username'].capitalize()}, here are the stats: {pastebin_url}"
+
+        reply_data = {
+            "player": player["username"],
+            "command": "one_life",
+            "payload": reply_string,
+        }
+
+        send_action = Utils.gen_send_action(request_source, reply_data)
+
+        if send_action:
+            self.p_q.put(send_action)
+        else:
+            print("stats_stuff error: Invalid source for send.")
