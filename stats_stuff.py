@@ -46,8 +46,26 @@ class Stats:
 
         target_dict["target"](action)
 
-    def __per_time(self):
-        pass
+    @staticmethod
+    def __per_time(total_time: int, stat_count: int) -> tuple[int, float, float]:
+        """
+        Takes a time in seconds(int) and a stat_count(int),
+        returns tuple of stat_count(int), count_per_day(float), count_per_hour(float)
+        """
+        number_of_hours = round(total_time / 3600)
+        number_of_days = round(number_of_hours / 24)
+
+        if number_of_hours == 0:
+            count_per_hour = 0
+        else:
+            count_per_hour = round(stat_count / number_of_hours, 3)
+
+        if number_of_days == 0:
+            count_per_day = 0
+        else:
+            count_per_day = round(stat_count / number_of_days, 3)
+
+        return stat_count, count_per_day, count_per_hour
 
     def handle_chat(self, action: dict):
         pass
