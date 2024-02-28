@@ -133,14 +133,23 @@ class Chat:
             if parsed_message["message"][:8].lower() == "!luxbot:":
                 self.handle_luxbot_command(parsed_message)
 
-        action = {
-            "target": "stats",
-            "action": "handle_chat",
-            "payload": parsed_message,
-            "source": "chat",
-        }
+        actions = [
+            {
+                "target": "stats",
+                "action": "handle_chat",
+                "payload": parsed_message,
+                "source": "chat",
+            },
+            {
+                "target": "integration",
+                "action": "log_chat_history",
+                "payload": message,
+                "source": "chat",
+            },
+        ]
 
-        self.p_q.put(action)
+        for action in actions:
+            self.p_q.put(action)
 
         print(parsed_message)
 
