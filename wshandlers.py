@@ -28,7 +28,10 @@ class WSHandlers:
                 },
                 "VALID_LOGIN": {
                     "target": self.on_valid_login
-                }
+                },
+                "EVENT_GLOBAL_PROGRESS": {
+                    "target": self.on_event_global_progress
+                },
             }
 
     def dispatch(self, action: dict):
@@ -100,14 +103,22 @@ class WSHandlers:
                         value = -abs(int(value[1:]))
             parsed_vars[key] = value
 
-        action = {
-            "target": "game",
-            "action": "set_items",
-            "payload": parsed_vars,
-            "source": "ws_handlers",
-        }
-
-        self.p_q.put(action)
+        actions = [
+            {
+                "target": "game",
+                "action": "set_items",
+                "payload": parsed_vars,
+                "source": "ws_handlers",
+            },
+            {
+                "target": "event",
+                "action": "handle_set_items",
+                "payload": parsed_vars,
+                "source": "ws_handlers",
+            }
+        ]
+        for action in actions:
+            self.p_q.put(action)
 
     def on_dialogue(self, message: dict):
         data = message["payload"]
@@ -135,3 +146,12 @@ class WSHandlers:
     @staticmethod
     def on_valid_login(message: dict):
         print("Signature verified. Login Successful.")
+
+    def on_event_global_progress(self, message: dict):
+        action = {
+            "target": "event",
+            "action": "handle_event_progress",
+            "payload": message,
+            "source": "ws_handlers",
+        }
+        self.p_q.put(action)
