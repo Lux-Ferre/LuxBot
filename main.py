@@ -11,6 +11,7 @@ from mod_stuff import Mod
 from admin_stuff import Admin
 from stats_stuff import Stats
 from event_stuff import Event
+from integration_stuff import Integrations
 
 
 class PrimaryHandler:
@@ -26,6 +27,7 @@ class PrimaryHandler:
         self.admin = Admin(self.p_q, self.db)
         self.stats = Stats(self.p_q, self.db)
         self.event = Event(self.p_q, self.db)
+        self.integration = Integrations(self.p_q, self.db)
 
         self.ws_handlers.apply_dispatch_map()
 
@@ -84,5 +86,7 @@ if __name__ == '__main__':
                 primary_handler.stats.dispatch(action)
             case "event":
                 primary_handler.event.dispatch(action)
+            case "integration":
+                primary_handler.integration.dispatch(action)
             case _:
                 print(f"Invalid primary handler for: {action}")
