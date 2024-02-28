@@ -111,6 +111,12 @@ class Customs:
                 "permission": 3,
                 "help_string": "Lists commands(with 'none', or gives a description of a command. [help:none/<command>]",
             },
+            "test": {
+                "target_module": "admin",
+                "target_command": "test",
+                "permission": 3,
+                "help_string": "Runs the testing admin method.",
+            }
         }
         self.p_q = p_q
         self.db = db
