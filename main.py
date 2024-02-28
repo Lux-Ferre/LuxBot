@@ -10,6 +10,7 @@ from fun_stuff import Fun
 from mod_stuff import Mod
 from admin_stuff import Admin
 from stats_stuff import Stats
+from event_stuff import Event
 
 
 class PrimaryHandler:
@@ -24,6 +25,7 @@ class PrimaryHandler:
         self.mod = Mod(self.p_q, self.db)
         self.admin = Admin(self.p_q, self.db)
         self.stats = Stats(self.p_q, self.db)
+        self.event = Event(self.p_q, self.db)
 
         self.ws_handlers.apply_dispatch_map()
 
@@ -80,5 +82,7 @@ if __name__ == '__main__':
                 primary_handler.admin.dispatch(action)
             case "stats":
                 primary_handler.stats.dispatch(action)
+            case "event":
+                primary_handler.event.dispatch(action)
             case _:
                 print(f"Invalid primary handler for: {action}")
