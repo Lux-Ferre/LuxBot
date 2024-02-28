@@ -116,7 +116,7 @@ class Customs:
                 "target_command": "test",
                 "permission": 3,
                 "help_string": "Runs the testing admin method.",
-            }
+            },
         }
         self.p_q = p_q
         self.db = db
@@ -202,6 +202,15 @@ class Customs:
         if parsed_message["anwin_formatted"]:
             if parsed_message["plugin"] == "interactor":
                 self.handle_luxbot_command(parsed_message)
+            if parsed_message["plugin"] == "chathist":
+                new_action = {
+                    "target": "integration",
+                    "action": "chat_hist_request",
+                    "payload": parsed_message,
+                    "source": "custom",
+                }
+
+                self.p_q.put(new_action)
         else:
             if parsed_message["player_offline"]:
                 print(f"Player offline: {player}")
@@ -243,7 +252,7 @@ class Customs:
 
         leading_data = f"CUSTOM={player}~{callback_id}:{plugin}:{command}"
 
-        payload_max_length = 120 - len(leading_data)
+        payload_max_length = 250 - len(leading_data)
 
         print(payload)
 
