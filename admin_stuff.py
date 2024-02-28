@@ -1,5 +1,6 @@
 import requests
 import json
+import random
 
 from multiprocessing.queues import Queue
 
@@ -24,12 +25,15 @@ class Admin:
             "add_stat": {
                 "target": self.add_stat
             },
-            "generic": {
+            "generic_ws": {
                 "target": self.generic
             },
             "close_connection": {
                 "target": self.close_connection
             },
+            "test": {
+                "target": self.test_stuff
+            }
         }
 
     def dispatch(self, action: dict):
@@ -159,3 +163,13 @@ class Admin:
 
         if action:
             self.p_q.put(action)
+
+    def test_stuff(self, action: dict):
+        actions = [
+        ]
+
+        if not actions:
+            return
+
+        for new_action in actions:
+            self.p_q.put(new_action)
