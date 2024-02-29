@@ -1,7 +1,7 @@
 from multiprocessing.queues import Queue
 
 from repo import Repo
-from utils import Utils
+from utils import Utils, RepeatTimer
 
 
 class Mod:
@@ -41,6 +41,9 @@ class Mod:
         }
         self.whois_requester = None
         self.online_mods = set()
+
+        mod_poll_timer = RepeatTimer(60, self.poll_online_mods)
+        mod_poll_timer.start()
 
     def dispatch(self, action: dict):
         target_dict = self.dispatch_map.get(action["action"], None)
@@ -149,6 +152,15 @@ class Mod:
             "player": "ALL",
             "command": "automod",
             "payload": f"{action['payload']['parsed_command']['payload']}",
+        }
+
+        self.send_modmod_message(message_data)
+
+    def poll_online_mods(self):
+        message_data = {
+            "player": "ALL",
+            "command": "HELLO",
+            "payload": f"0:0",
         }
 
         self.send_modmod_message(message_data)
