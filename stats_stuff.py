@@ -107,7 +107,6 @@ class Stats:
         player = message_data["player"]
 
         if player["perm_level"] < 0:
-            print(f"{player['username']}[{player['perm_level']} attempted to use dynamic command.")
             return
 
         if message_text[0] == "!":
