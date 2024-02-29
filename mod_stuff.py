@@ -57,6 +57,7 @@ class Mod:
 
         target_dict["target"](action)
 
+    # ModMod Stuff
     def handle_modmod(self, action: dict):
         parsed_custom = action["payload"]
         target_dict = self.modmod_dispatch_map.get(parsed_custom["command"], None)
@@ -158,6 +159,7 @@ class Mod:
         }
 
         self.send_modmod_message(message_data)
+    # End ModMod Stuff
 
     def poll_online_mods(self):
         message_data = {
