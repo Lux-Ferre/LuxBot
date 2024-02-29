@@ -23,6 +23,9 @@ class Mod:
             },
             "handle_modmod": {
                 "target": self.handle_modmod
+            },
+            "handle_offline_mod": {
+                "target": self.handle_offline_mod
             }
         }
         self.modmod_dispatch_map = {
@@ -161,6 +164,25 @@ class Mod:
             "player": "ALL",
             "command": "HELLO",
             "payload": f"0:0",
+        }
+
+        self.send_modmod_message(message_data)
+
+    def handle_offline_mod(self, action: dict):
+        player = action['payload']['player']['username']
+
+        if player not in self.online_mods:
+            return
+
+        try:
+            self.online_mods.remove(player)
+        except ValueError:
+            pass
+
+        message_data = {
+            "player": "ALL",
+            "command": "logout",
+            "payload": f"{player}",
         }
 
         self.send_modmod_message(message_data)

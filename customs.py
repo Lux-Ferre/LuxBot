@@ -222,7 +222,14 @@ class Customs:
                 self.p_q.put(new_action)
         else:
             if parsed_message["player_offline"]:
-                print(f"Player offline: {player}")
+                new_action = {
+                    "target": "mod",
+                    "action": "handle_offline_mod",
+                    "payload": parsed_message,
+                    "source": "custom",
+                }
+
+                self.p_q.put(new_action)
             else:
                 print(f"Invalid custom, not Anwin Standard: {parsed_message}")
 
