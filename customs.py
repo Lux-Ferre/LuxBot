@@ -263,8 +263,6 @@ class Customs:
 
         payload_max_length = 250 - len(leading_data)
 
-        print(payload)
-
         paginated_payload = re.findall(".{1," + f"{payload_max_length}" + "}", payload)
 
         if player and command:
