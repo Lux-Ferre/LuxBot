@@ -202,10 +202,19 @@ class Customs:
         if parsed_message["anwin_formatted"]:
             if parsed_message["plugin"] == "interactor":
                 self.handle_luxbot_command(parsed_message)
-            if parsed_message["plugin"] == "chathist":
+            elif parsed_message["plugin"] == "chathist":
                 new_action = {
                     "target": "integration",
                     "action": "chat_hist_request",
+                    "payload": parsed_message,
+                    "source": "custom",
+                }
+
+                self.p_q.put(new_action)
+            elif parsed_message["plugin"] == "MODMOD":
+                new_action = {
+                    "target": "mod",
+                    "action": "handle_modmod",
                     "payload": parsed_message,
                     "source": "custom",
                 }

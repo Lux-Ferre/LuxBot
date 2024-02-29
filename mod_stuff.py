@@ -20,9 +20,27 @@ class Mod:
             },
             "received_whois": {
                 "target": self.received_whois
+            },
+            "handle_modmod": {
+                "target": self.handle_modmod
             }
         }
+        self.modmod_dispatch_map = {
+            "HELLO": {
+                "target": self.modmod_hello,
+            },
+            "MODCHAT": {
+                "target": self.modmod_modchat,
+            },
+            "context": {
+                "target": self.modmod_context,
+            },
+            "automod": {
+                "target": self.modmod_automod,
+            },
+        }
         self.whois_requester = None
+        self.online_mods = set()
 
     def dispatch(self, action: dict):
         target_dict = self.dispatch_map.get(action["action"], None)
@@ -32,6 +50,108 @@ class Mod:
             return
 
         target_dict["target"](action)
+
+    def handle_modmod(self, action: dict):
+        parsed_custom = action["payload"]
+        target_dict = self.modmod_dispatch_map.get(parsed_custom["command"], None)
+
+        self.online_mods.add(parsed_custom["player"]["username"])
+
+        if target_dict is None:
+            print(f"ModMod dispatch error: No handler for {parsed_custom['command']}")
+            return
+
+        new_payload = {
+            "player": parsed_custom["player"],
+            "parsed_command": {
+                'callback_id': parsed_custom["callback_id"],
+                'plugin': parsed_custom["plugin"],
+                'command': parsed_custom["command"],
+                'payload': parsed_custom["payload"],
+                'anwin_formatted': parsed_custom["anwin_formatted"],
+                'player_offline': parsed_custom["player_offline"],
+                "time": parsed_custom["time"],
+            },
+        }
+
+        new_action = {
+            "target": "modmod",
+            "action": parsed_custom["command"],
+            "payload": new_payload,
+            "source": "custom",
+        }
+
+        target_dict["target"](new_action)
+
+    def send_modmod_message(self, message_data: dict):
+        if message_data["player"] == "ALL":
+            mods = list(self.online_mods)
+        else:
+            mods = [message_data["player"]]
+
+        for mod in mods:
+            send_data = {
+                "player": mod,
+                "plugin": "ModMod",
+                "command": message_data["command"],
+                "payload": message_data["payload"],
+            }
+
+            send_action = Utils.gen_send_action("custom", send_data)
+
+            if send_action:
+                self.p_q.put(send_action)
+            else:
+                print("mod_stuff error: Invalid source for send.")
+
+    def modmod_hello(self, action: dict):
+        if action['payload']['parsed_command']['payload'] == "1:0":
+            message_data = {
+                "player": "ALL",
+                "command": "login",
+                "payload": f"{action['payload']['player']['username']}",
+            }
+
+            self.send_modmod_message(message_data)
+
+            mod_string = ""
+            for mod in self.online_mods:
+                mod_string += f"{mod},"
+
+            message_data = {
+                "player": f"{action['payload']['player']['username']}",
+                "command": "list",
+                "payload": f"{mod_string[:-1]}",
+            }
+
+            self.send_modmod_message(message_data)
+
+    def modmod_modchat(self, action: dict):
+        message_data = {
+            "player": "ALL",
+            "command": "message",
+            "payload": f"{action['payload']['player']['username']}: {action['payload']['parsed_command']['payload']}",
+        }
+
+        self.send_modmod_message(message_data)
+
+    def modmod_context(self, action: dict):
+        message_data = {
+            "player": "ALL",
+            "command": "context",
+            "payload": f"{action['payload']['parsed_command']['payload']}",
+        }
+
+        self.send_modmod_message(message_data)
+
+    def modmod_automod(self, action: dict):
+        message_data = {
+            "player": "ALL",
+            "command": "automod",
+            "payload": f"{action['payload']['parsed_command']['payload']}",
+        }
+
+        self.send_modmod_message(message_data)
 
     def update_triggers(self, action: dict):
         # {'payload': {'player': {'username': '', 'perm_level': 3}, 'parsed_command': {}}}
