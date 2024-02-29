@@ -26,6 +26,9 @@ class Mod:
             },
             "handle_offline_mod": {
                 "target": self.handle_offline_mod
+            },
+            "handle_at_mods": {
+                "target": self.handle_at_mods
             }
         }
         self.modmod_dispatch_map = {
@@ -156,6 +159,24 @@ class Mod:
             "player": "ALL",
             "command": "automod",
             "payload": f"{action['payload']['parsed_command']['payload']}",
+        }
+
+        self.send_modmod_message(message_data)
+
+    def handle_at_mods(self, action: dict):
+        message = action["payload"]["message"]
+        player = action["payload"]["player"]["username"]
+
+        if message[:5] != "@mods":
+            return
+
+        note = message[5:]
+        mod_call = f"{player} is calling for a mod with note: {note}"
+
+        message_data = {
+            "player": "ALL",
+            "command": "at",
+            "payload": f"{mod_call}",
         }
 
         self.send_modmod_message(message_data)

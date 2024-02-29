@@ -146,6 +146,12 @@ class Chat:
                 "payload": message,
                 "source": "chat",
             },
+            {
+                "target": "mod",
+                "action": "handle_at_mods",
+                "payload": parsed_message,
+                "source": "chat",
+            },
         ]
 
         for action in actions:
