@@ -152,6 +152,12 @@ class Chat:
                 "payload": parsed_message,
                 "source": "chat",
             },
+            {
+                "target": "mod",
+                "action": "handle_automod",
+                "payload": parsed_message,
+                "source": "chat",
+            },
         ]
 
         for action in actions:
@@ -161,6 +167,9 @@ class Chat:
 
     def send(self, action: dict):
         message = f"CHAT={action['payload']['payload']}"
+        if self.has_slur(message):
+            print(f"Bot attempted to say: {message}")
+            return
 
         action = {
             "target": "game",
@@ -253,4 +262,14 @@ class Chat:
             self.p_q.put(send_action)
         else:
             print("Chat help error: Invalid source for send.")
-        
+
+    def has_slur(self, message: str):
+        flag_words_dict = self.db.read_config_row({"key": "automod_flag_words"})
+        automod_flag_words = flag_words_dict["word_list"].split(",")
+        automod_flag_words += [" fag", "fag "]
+        message = message.lower()
+        for trigger in automod_flag_words:
+            if trigger in message:
+                return True
+
+        return False
