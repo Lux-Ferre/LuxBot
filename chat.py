@@ -128,6 +128,7 @@ class Chat:
         parsed_message = self.parse_chat(message["payload"])
 
         parsed_message["time"] = message["time"]
+        parsed_message["has_slur"] = self.has_slur(parsed_message["message"])
 
         if parsed_message["message"][0] == "!":
             if parsed_message["message"][:8].lower() == "!luxbot:":
