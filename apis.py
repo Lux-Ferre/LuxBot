@@ -16,6 +16,9 @@ class APIs:
             "chat_mirror_webhook": {
                 "target": self.chat_mirror_webhook,
             },
+            "event_webhook": {
+                "target": self.event_webhook,
+            },
         }
 
     def get_env_var(self, env_var: str) -> str:
@@ -48,12 +51,25 @@ class APIs:
 
     async def chat_mirror_webhook(self, action: dict):
         message = action["payload"]
+        hook_url = self.env_consts["DISCORD_TEST_WEBHOOK_URL"]
+
         message = message.replace("@mods", "<@&291724449340719104>", 1)
         allowed = discord.AllowedMentions(everyone=False, users=False,
                                           roles=[discord.Object(id="291724449340719104", type=discord.Role)])
 
         async with aiohttp.ClientSession() as session:
-            webhook = discord.Webhook.from_url(self.env_consts["DISCORD_TEST_WEBHOOK_URL"], session=session)
+            webhook = discord.Webhook.from_url(hook_url, session=session)
+            await webhook.send(content=message, allowed_mentions=allowed)
+
+    async def event_webhook(self, action: dict):
+        message = action["payload"]
+        hook_url = self.env_consts["DISCORD_TEST_WEBHOOK_URL"]
+
+        allowed = discord.AllowedMentions(everyone=False, users=False,
+                                          roles=[discord.Object(id="1142985685184282705", type=discord.Role)])
+
+        async with aiohttp.ClientSession() as session:
+            webhook = discord.Webhook.from_url(hook_url, session=session)
             await webhook.send(content=message, allowed_mentions=allowed)
 
     def run(self):
