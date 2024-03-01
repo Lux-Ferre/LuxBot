@@ -16,6 +16,9 @@ class Integrations:
             "log_chat_history": {
                 "target": self.log_chat_history
             },
+            "mirror_chat_to_discord": {
+                "target": self.mirror_chat_to_discord
+            }
         }
         self.chat_history = deque([], 5)
 
@@ -70,3 +73,26 @@ class Integrations:
 
         for new_action in actions:
             self.p_q.put(new_action)
+
+    def mirror_chat_to_discord(self, action: dict):
+        message_data = action["payload"]
+        if message_data["has_slur"]:
+            return
+
+        player = message_data["player"]
+        message = message_data["message"]
+        message_time = message_data["time"]
+
+        timestamp = int(message_time.timestamp())
+        timestamp_string = f"<t:{timestamp}:t>"
+
+        formatted_chat = f'*[{timestamp_string}]* **{player["username"]}:** {message} '
+
+        new_action = {
+            'target': 'api',
+            'action': 'chat_mirror_webhook',
+            'payload': formatted_chat,
+            'source': 'custom'
+        }
+
+        self.p_q.put(new_action)

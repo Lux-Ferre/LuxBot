@@ -13,8 +13,8 @@ class APIs:
         self.p_q = p_q
         self.api_queue = api_queue
         self.dispatch_map = {
-            "send_discord_webhook": {
-                "target": self.send_discord_webhook,
+            "chat_mirror_webhook": {
+                "target": self.chat_mirror_webhook,
             },
         }
 
@@ -46,8 +46,8 @@ class APIs:
 
         await action_target["target"](action)
 
-    async def send_discord_webhook(self, action: dict):
-        message = action["payload"]["payload"]
+    async def chat_mirror_webhook(self, action: dict):
+        message = action["payload"]
         message = message.replace("@mods", "<@&291724449340719104>", 1)
         allowed = discord.AllowedMentions(everyone=False, users=False,
                                           roles=[discord.Object(id="291724449340719104", type=discord.Role)])

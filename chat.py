@@ -119,6 +119,7 @@ class Chat:
         return message_data
 
     def handle(self, action: dict):
+        print(action)
         if action["action"] == "send":
             self.send(action)
             return
@@ -159,6 +160,12 @@ class Chat:
             {
                 "target": "mod",
                 "action": "handle_automod",
+                "payload": parsed_message,
+                "source": "chat",
+            },
+            {
+                "target": "integration",
+                "action": "mirror_chat_to_discord",
                 "payload": parsed_message,
                 "source": "chat",
             },
