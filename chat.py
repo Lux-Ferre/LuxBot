@@ -119,7 +119,6 @@ class Chat:
         return message_data
 
     def handle(self, action: dict):
-        print(action)
         if action["action"] == "send":
             self.send(action)
             return
