@@ -65,16 +65,19 @@ class Event:
         start_timer = self.current_event_start_timer
         event_type = self.current_event_type
 
-        current_time = datetime.now(timezone.utc)
-        time_delta = timedelta(seconds=start_timer)
+        event_data = {
+            "start_timer": start_timer,
+            "event_type": event_type
+        }
 
-        event_start_object = current_time + time_delta
-        timestamp = int(event_start_object.timestamp())
-        event_start_string = f"<t:{timestamp}:f>"
+        new_action = {
+            "target": "integration",
+            "action": "broadcast_event_start",
+            "payload": event_data,
+            "source": "game",
+        }
 
-        discord_declaration = f"<@&1142985685184282705>, A {event_type} event will start in {start_timer} seconds! ({event_start_string})"
-
-        print(discord_declaration)
+        self.p_q.put(new_action)
 
     def handle_event_end(self):
         self.event_countdown_started = False
@@ -91,13 +94,16 @@ class Event:
 
         self.parsed_event_score = sorted_scores
 
-        formatted_scores = f"The last event was a {event_type} event. The final scores were: \n"
+        event_data = {
+            "event_type": event_type,
+            "sorted_scores": sorted_scores
+        }
 
-        for rank, username in enumerate(sorted_scores):
-            new_line = f"{rank + 1}: {username} - {sorted_scores[username]}\n"
-            if len(formatted_scores) + len(new_line) < 2000:
-                formatted_scores += new_line
-            else:
-                break
+        new_action = {
+            "target": "integration",
+            "action": "broadcast_event_end",
+            "payload": event_data,
+            "source": "game",
+        }
 
-        print(formatted_scores)
+        self.p_q.put(new_action)

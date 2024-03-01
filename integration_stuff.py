@@ -1,5 +1,6 @@
 from multiprocessing.queues import Queue
 from collections import deque
+from datetime import datetime, timedelta, timezone
 
 from repo import Repo
 from utils import Utils
@@ -18,7 +19,13 @@ class Integrations:
             },
             "mirror_chat_to_discord": {
                 "target": self.mirror_chat_to_discord
-            }
+            },
+            "broadcast_event_start": {
+                "target": self.broadcast_event_start
+            },
+            "broadcast_event_end": {
+                "target": self.broadcast_event_end
+            },
         }
         self.chat_history = deque([], 5)
 
@@ -92,7 +99,51 @@ class Integrations:
             'target': 'api',
             'action': 'chat_mirror_webhook',
             'payload': formatted_chat,
-            'source': 'custom'
+            'source': 'integration'
+        }
+
+        self.p_q.put(new_action)
+
+    def broadcast_event_start(self, action: dict):
+        start_timer = action["payload"]["start_timer"]
+        event_type = action["payload"]["event_type"]
+
+        current_time = datetime.now(timezone.utc)
+        time_delta = timedelta(seconds=start_timer)
+
+        event_start_object = current_time + time_delta
+        timestamp = int(event_start_object.timestamp())
+        event_start_string = f"<t:{timestamp}:f>"
+
+        discord_declaration = f"<@&1142985685184282705>, A {event_type} event will start in {start_timer} seconds! ({event_start_string})"
+
+        new_action = {
+            'target': 'api',
+            'action': 'event_webhook',
+            'payload': discord_declaration,
+            'source': 'integration'
+        }
+
+        self.p_q.put(new_action)
+
+    def broadcast_event_end(self, action: dict):
+        event_type = action["payload"]["event_type"]
+        sorted_scores = action["payload"]["sorted_scores"]
+
+        formatted_scores = f"The last event was a {event_type} event. The final scores were: \n"
+
+        for rank, username in enumerate(sorted_scores):
+            new_line = f"{rank + 1}: {username} - {sorted_scores[username]}\n"
+            if len(formatted_scores) + len(new_line) < 2000:
+                formatted_scores += new_line
+            else:
+                break
+
+        new_action = {
+            'target': 'api',
+            'action': 'event_webhook',
+            'payload': formatted_scores,
+            'source': 'integration'
         }
 
         self.p_q.put(new_action)
