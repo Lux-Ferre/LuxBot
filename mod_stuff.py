@@ -218,7 +218,18 @@ class Mod:
     def handle_automod(self, action: dict):
         player = action['payload']['player']
         message = action["payload"]["message"]
-        flag_words_dict = self.db.read_config_row({"key": "automod_flag_words"})
+        has_slur = action["payload"]["has_slur"]
+        trigger = action["payload"]["detected_slur"]
+
+        if not has_slur:
+            return
+
+        bot_list = {"botofnades": "BotofNades", "wikisearch": "WikiSearch"}
+        if player["username"] in bot_list:
+            reply_string = f"Silly {bot_list[player['username']]}, you shouldn't copy the fleshbags' bad words. I forgive you though."
+            send_action = Utils.gen_send_action("chat", {"payload": reply_string})
+            self.p_q.put(send_action)
+            return
 
         automod_replies = [
             f"{player['username']} has been axed from chat.",
@@ -231,38 +242,26 @@ class Mod:
             f"█▬▬ ◟(`ﮧ´ ◟ )",
         ]
 
-        automod_flag_words = flag_words_dict["word_list"].split(",")
-        automod_flag_words += [" fag", "fag "]
-        message = message.lower()
-        for trigger in automod_flag_words:
-            if trigger in message:
-                bot_list = {"botofnades": "BotofNades", "wikisearch": "WikiSearch"}
-                if player["username"] in bot_list:
-                    reply_string = f"Silly {bot_list[player['username']]}, you shouldn't copy the fleshbags' bad words. I forgive you though."
-                    send_action = Utils.gen_send_action("chat", {"payload": reply_string})
-                    self.p_q.put(send_action)
-                    return
+        message_data = {
+            "player": "ALL",
+            "command": "automod",
+            "payload": f"**{player['username']} has been muted for using the word: {trigger}**",
+        }
 
-                message_data = {
-                    "player": "ALL",
-                    "command": "automod",
-                    "payload": f"**{player['username']} has been muted for using the word: {trigger}**",
-                }
+        self.send_modmod_message(message_data)
 
-                self.send_modmod_message(message_data)
+        target = player['username']
+        length = "24"
+        reason = f'Using the word: {trigger}: "{message}"'
+        is_ip = "false"
+        actions = [
+            Utils.gen_mute_action(target, length, reason, is_ip),
+            Utils.gen_send_action("chat", {"payload": random.choice(automod_replies)})
+        ]
 
-                target = player['username']
-                length = "24"
-                reason = f'Using the word: {trigger}: "{message}"'
-                is_ip = "false"
-                actions = [
-                    Utils.gen_mute_action(target, length, reason, is_ip),
-                    Utils.gen_send_action("chat", {"payload": random.choice(automod_replies)})
-                ]
-
-                for new_action in actions:
-                    self.p_q.put(new_action)
-                return
+        for new_action in actions:
+            self.p_q.put(new_action)
+        return
 
     def update_triggers(self, action: dict):
         # {'payload': {'player': {'username': '', 'perm_level': 3}, 'parsed_command': {}}}

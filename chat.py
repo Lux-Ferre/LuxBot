@@ -128,7 +128,10 @@ class Chat:
         parsed_message = self.parse_chat(message["payload"])
 
         parsed_message["time"] = message["time"]
-        parsed_message["has_slur"] = self.has_slur(parsed_message["message"])
+
+        has_slur, detected_slur = self.has_slur(parsed_message["message"])
+        parsed_message["has_slur"] = has_slur
+        parsed_message["detected_slur"] = detected_slur
 
         if parsed_message["message"][0] == "!":
             if parsed_message["message"][:8].lower() == "!luxbot:":
@@ -168,7 +171,8 @@ class Chat:
 
     def send(self, action: dict):
         message = f"CHAT={action['payload']['payload']}"
-        if self.has_slur(message):
+        has_slur, _ = self.has_slur(message)
+        if has_slur:
             print(f"Bot attempted to say: {message}")
             return
 
@@ -271,6 +275,6 @@ class Chat:
         message = message.lower()
         for trigger in automod_flag_words:
             if trigger in message:
-                return True
+                return True, trigger
 
-        return False
+        return False, None
