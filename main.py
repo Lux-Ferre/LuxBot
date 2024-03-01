@@ -2,6 +2,7 @@ from multiprocessing import Process, Manager
 from multiprocessing.queues import Queue
 
 from idle_pixel_bot import Game
+from apis import APIs
 from wshandlers import WSHandlers
 from customs import Customs
 from chat import Chat
@@ -19,6 +20,7 @@ class PrimaryHandler:
         self.p_q = p_queue
         self.db = Repo()
         self.main_thread = self.create_main_process()
+        self.api_process = self.create_api_process()
         self.ws_handlers = WSHandlers(self.p_q)
         self.customs = Customs(self.p_q, self.db)
         self.chat = Chat(self.p_q, self.db)
@@ -35,6 +37,7 @@ class PrimaryHandler:
         match target["action"]:
             case "main_start":
                 self.main_thread.start()
+                self.api_process.start()
             case "main_close":
                 self.main_thread.terminate()
             case "main_restart":
@@ -47,11 +50,15 @@ class PrimaryHandler:
     def create_main_process(self) -> Process:
         return Process(target=Game(self.p_q, game_queue).run)
 
+    def create_api_process(self) -> Process:
+        return Process(target=APIs(self.p_q, api_queue).run)
+
 
 if __name__ == '__main__':
     manager = Manager()
     primary_queue = manager.Queue()
     game_queue = manager.Queue()
+    api_queue = manager.Queue()
 
     main_action = {
         "target": "main",
@@ -70,6 +77,8 @@ if __name__ == '__main__':
                 primary_handler.dispatch(action)
             case "game":
                 game_queue.put(action)
+            case "api":
+                api_queue.put(action)
             case "ws_handlers":
                 primary_handler.ws_handlers.dispatch(action)
             case "custom":
