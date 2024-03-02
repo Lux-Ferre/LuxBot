@@ -233,8 +233,6 @@ class Customs:
             else:
                 print(f"Invalid custom, not Anwin Standard: {parsed_message}")
 
-        print(parsed_message)
-
     def handle_luxbot_command(self, message: dict):
         player_perm = message["player"]["perm_level"]
         dispatch_data = self.dispatch_map.get(message["command"], None)
