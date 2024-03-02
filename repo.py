@@ -51,8 +51,10 @@ class Repo:
 
         try:
             self.database.set_db(query, pet_data)
+            return {"has_error": False, "error_type": None}
         except sqlite3.IntegrityError as e:
             print(e)
+            return {"has_error": True, "error_type": "integrity"}
 
     def update_permission(self, payload: dict):
         updated_player = payload["updated_player"]
