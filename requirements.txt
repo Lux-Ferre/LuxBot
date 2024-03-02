@@ -3,3 +3,6 @@ playwright
 beautifulsoup4
 websocket-client
 rel
+fastapi
+aiohttp
+uvicorn
