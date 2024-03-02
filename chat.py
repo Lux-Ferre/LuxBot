@@ -173,8 +173,6 @@ class Chat:
         for action in actions:
             self.p_q.put(action)
 
-        print(parsed_message)
-
     def send(self, action: dict):
         message = f"CHAT={action['payload']['payload']}"
         has_slur, _ = self.has_slur(message)
@@ -231,7 +229,13 @@ class Chat:
 
         self.last_com_time = current_time
 
-        req_perm = self.dispatch_map[parsed_command["command"]]["permission"]
+        dispatched_command = self.dispatch_map.get(parsed_command["command"], None)
+
+        if dispatched_command is None:
+            print(f"Invalid LuxBot command: {parsed_command}")
+            return
+
+        req_perm = dispatched_command["permission"]
 
         if message["player"]["perm_level"] < req_perm:
             print(f"{message['player']['username']}[{message['player']['perm_level']}] attempted command {parsed_command['command']}[{req_perm}]!")
