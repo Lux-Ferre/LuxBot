@@ -1,8 +1,11 @@
+import asyncio
 from multiprocessing import Process, Manager
 from multiprocessing.queues import Queue
 
 from idle_pixel_bot import Game
 from apis import APIs
+from webapp.webapp import WebApp
+
 from wshandlers import WSHandlers
 from customs import Customs
 from chat import Chat
@@ -21,6 +24,7 @@ class PrimaryHandler:
         self.db = Repo()
         self.main_thread = self.create_main_process()
         self.api_process = self.create_api_process()
+        self.webapp = self.create_webui_process()
         self.ws_handlers = WSHandlers(self.p_q)
         self.customs = Customs(self.p_q, self.db)
         self.chat = Chat(self.p_q, self.db)
@@ -38,6 +42,7 @@ class PrimaryHandler:
             case "main_start":
                 self.main_thread.start()
                 self.api_process.start()
+                self.webapp.start()
             case "main_close":
                 self.main_thread.terminate()
             case "main_restart":
@@ -52,6 +57,9 @@ class PrimaryHandler:
 
     def create_api_process(self) -> Process:
         return Process(target=APIs(self.p_q, api_queue).run)
+
+    def create_webui_process(self) -> Process:
+        return Process(target=WebApp(self.p_q).run)
 
 
 if __name__ == '__main__':
