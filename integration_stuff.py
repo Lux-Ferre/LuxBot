@@ -17,6 +17,9 @@ class Integrations:
             "log_chat_history": {
                 "target": self.log_chat_history
             },
+            "handle_pet_helper": {
+                "target": self.handle_pet_helper
+            },
             "mirror_chat_to_discord": {
                 "target": self.mirror_chat_to_discord
             },
@@ -80,6 +83,53 @@ class Integrations:
 
         for new_action in actions:
             self.p_q.put(new_action)
+
+    def handle_pet_helper(self, action: dict):
+        player = action["payload"]["player"]
+        if player["perm_level"] < 2:
+            print(f"{player['username']} attempted to use pet helper.")
+            return
+
+        command = action["payload"]["command"]
+        if command == "add":
+            self.add_pet(action["payload"])
+        else:
+            print(f"Invalid pethelp command: {command}")
+
+    def add_pet(self, data: dict):
+        pet_info = data["payload"]
+        player = data["player"]
+        split_data = pet_info.split(";")
+
+        if len(split_data) != 3:
+            return
+
+        name = split_data[0]
+        title = split_data[1]
+        url = split_data[2]
+
+        pet_data = (title, name, url)
+
+        error_data = self.db.add_pet(pet_data)
+
+        if error_data["has_error"]:
+            reply_data = {
+                "player": player["username"],
+                "plugin": "pethelp",
+                "command": "error",
+                "payload": "titleExists",
+            }
+        else:
+            reply_data = {
+                "player": player["username"],
+                "plugin": "pethelp",
+                "command": "success",
+                "payload": "none",
+            }
+
+        send_action = Utils.gen_send_action("custom", reply_data)
+
+        self.p_q.put(send_action)
 
     def mirror_chat_to_discord(self, action: dict):
         message_data = action["payload"]
