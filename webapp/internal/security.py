@@ -101,7 +101,7 @@ async def get_current_active_user(
     return current_user
 
 
-@router.post("/token")
+@router.post("/token", tags=["security"])
 async def login_for_access_token(
         form_data: Annotated[OAuth2PasswordRequestForm, Depends()]
 ) -> Token:

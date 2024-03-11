@@ -7,6 +7,7 @@ router = APIRouter(
     prefix="/chat",
     dependencies=[Depends(security.get_current_active_user)],
     responses={404: {"description": "Not found"}},
+    tags=["chat"]
 )
 
 
