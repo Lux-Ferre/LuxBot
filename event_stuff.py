@@ -43,7 +43,7 @@ class Event:
         new_data = {
             "current_event_start_timer": parsed_items.get("event_upcomming_timer", None),
             "current_event_type": parsed_items.get("event_name", None),
-            "current_event_running_timer": parsed_items.get("event_active_timer", None),
+            "current_event_running_timer": parsed_items.get("event_active_timer", 1),
         }
 
         for key, value in new_data.items():
