@@ -4,7 +4,7 @@ from multiprocessing import Queue
 from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
 
-from .routers import items, users, admin
+from .routers import admin, chat
 from .internal import security
 
 from repo import Repo
@@ -23,8 +23,7 @@ class WebApp:
         app.mount("/ui/", StaticFiles(directory="./webapp/static/ui", html=True), name="ui")
 
         app.include_router(security.router)
-        app.include_router(users.router)
-        app.include_router(items.router)
         app.include_router(admin.router)
+        app.include_router(chat.router)
 
         uvicorn.run(app, host="127.0.0.1", port=8080, log_level="info")
