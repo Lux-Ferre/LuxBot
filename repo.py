@@ -134,9 +134,6 @@ class Repo:
         else:
             return level[0]
 
-    def fetch_db(self, action: dict):
-        return self.database.fetch_db(action["query"], action["params"], action["many"])
-
 
 class SQLiteDB:
     def __init__(self):
