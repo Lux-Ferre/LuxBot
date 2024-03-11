@@ -30,3 +30,8 @@ class GameInstruction(BaseModel):
 class Permission(BaseModel):
     player: str
     level: int
+
+
+# Chat
+class ChatMessage(BaseModel):
+    message: str
