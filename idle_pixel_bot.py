@@ -184,7 +184,11 @@ class Game:
         message = action["payload"]
 
         self.log_ws_message(message, False)
-        self.game_ws.send(message)
+        try:
+            self.game_ws.send(message)
+        except Exception as e:
+            print(e)
+            traceback.print_tb(e.__traceback__)
 
     def dispatch(self, action: dict):
         action_target = self.dispatch_map.get(action["action"], None)
