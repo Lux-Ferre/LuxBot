@@ -27,6 +27,6 @@ class GameInstruction(BaseModel):
     instruction: str
 
 
-class NewPermission(BaseModel):
+class Permission(BaseModel):
     player: str
     level: int
