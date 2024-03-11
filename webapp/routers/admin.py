@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, Request
+from fastapi import APIRouter, Depends, Request, Response, status
 
 from ..internal import security
 from ..models import GameInstruction, Permission
@@ -11,7 +11,7 @@ router = APIRouter(
 
 
 @router.put("/game")
-async def game_instruction(request: Request, payload: GameInstruction) -> str:
+async def game_instruction(request: Request, response: Response, payload: GameInstruction) -> str:
     new_instruction = payload.instruction
 
     if new_instruction == "close":
@@ -32,6 +32,9 @@ async def game_instruction(request: Request, payload: GameInstruction) -> str:
         }
         request.app.p_q.put(action)
         return "Reset instruction issued to game."
+    else:
+        response.status_code = status.HTTP_422_UNPROCESSABLE_ENTITY
+        return "Invalid instruction"
 
 
 @router.get("/permission")
@@ -43,7 +46,11 @@ async def get_permission(request: Request, name: str) -> Permission:
 
 
 @router.put("/permission")
-async def put_permission(request: Request, payload: Permission) -> Permission:
+async def put_permission(request: Request, response: Response, payload: Permission) -> Permission | str:
+    if not -2 <= payload.level <= 3:
+        response.status_code = status.HTTP_422_UNPROCESSABLE_ENTITY
+        return "Permission must be between -2 and 3 inclusive."
+
     update_data = {
         "updated_player": payload.player,
         "level": payload.level
