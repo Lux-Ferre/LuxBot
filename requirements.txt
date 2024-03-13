@@ -6,3 +6,7 @@ rel
 fastapi
 aiohttp
 uvicorn
+pydantic
+bcrypt
+python-multipart
+python-jose[cryptography]
