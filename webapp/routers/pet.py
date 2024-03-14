@@ -36,7 +36,7 @@ async def get_pet_link_by_title(request: Request, title: str) -> PetLink:
         raise HTTPException(status_code=204, detail="Photo title does not exist.")
 
 
-@router.put("/")
+@router.post("/")
 async def add_pet_photo_to_db(request: Request, payload: PetLink) -> PetLink:
     if "prnt.sc" not in payload.url:
         raise HTTPException(status_code=400, detail="Photo must be hosted at prnt.sc")
