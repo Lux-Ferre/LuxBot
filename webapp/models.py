@@ -35,3 +35,12 @@ class Permission(BaseModel):
 # Chat
 class ChatMessage(BaseModel):
     message: str
+
+
+# Customs
+class AnwinCustomMessage(BaseModel):
+    player: str
+    callback_id: str | None = None
+    plugin: str | None = None
+    command: str
+    payload: str | None = None
