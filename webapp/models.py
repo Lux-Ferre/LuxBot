@@ -51,3 +51,8 @@ class PetLink(BaseModel):
     name: str
     title: str
     url: str
+
+
+# Moderation
+class AutomodTrigger(BaseModel):
+    trigger_word: str

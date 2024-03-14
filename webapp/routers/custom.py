@@ -6,7 +6,6 @@ from ..models import AnwinCustomMessage
 router = APIRouter(
     prefix="/custom",
     dependencies=[Depends(security.get_current_active_user)],
-    responses={404: {"description": "Not found"}},
     tags=["customs"]
 )
 

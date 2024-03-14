@@ -6,7 +6,6 @@ from ..models import GameInstruction, Permission
 router = APIRouter(
     prefix="/admin",
     dependencies=[Depends(security.get_current_active_user)],
-    responses={404: {"description": "Not found"}},
     tags=["admin"]
 )
 

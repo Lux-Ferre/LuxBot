@@ -6,7 +6,6 @@ from ..models import PetLink
 router = APIRouter(
     prefix="/pet",
     dependencies=[Depends(security.get_current_active_user)],
-    responses={404: {"description": "Not found"}},
     tags=["pets"]
 )
 
