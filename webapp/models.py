@@ -44,3 +44,10 @@ class AnwinCustomMessage(BaseModel):
     plugin: str | None = None
     command: str
     payload: str | None = None
+
+
+# Pets
+class PetLink(BaseModel):
+    name: str
+    title: str
+    url: str
