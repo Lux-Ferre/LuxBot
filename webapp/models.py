@@ -56,3 +56,10 @@ class PetLink(BaseModel):
 # Moderation
 class AutomodTrigger(BaseModel):
     trigger_word: str
+
+
+class PlayerMute(BaseModel):
+    target: str
+    reason: str
+    length: int
+    is_ip: bool
