@@ -12,7 +12,7 @@ router = APIRouter(
 
 
 @router.put("/send")
-async def send_custom(request: Request, payload: AnwinCustomMessage) -> str:
+async def send_custom_message(request: Request, payload: AnwinCustomMessage) -> str:
     action_payload = {}
     for data_point in payload:
         if data_point[1]:

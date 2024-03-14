@@ -12,7 +12,7 @@ router = APIRouter(
 
 
 @router.put("/send")
-async def send_chat(request: Request, payload: ChatMessage) -> str:
+async def send_chat_message(request: Request, payload: ChatMessage) -> str:
     action = {
         "target": "chat",
         "action": "send",

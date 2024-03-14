@@ -12,7 +12,7 @@ router = APIRouter(
 
 
 @router.put("/game")
-async def game_instruction(request: Request, payload: GameInstruction) -> str:
+async def issue_game_instruction(request: Request, payload: GameInstruction) -> str:
     new_instruction = payload.instruction
 
     if new_instruction == "close":
@@ -38,7 +38,7 @@ async def game_instruction(request: Request, payload: GameInstruction) -> str:
 
 
 @router.get("/permission")
-async def get_permission(request: Request, name: str) -> Permission:
+async def get_permission_by_name(request: Request, name: str) -> Permission:
     level = request.app.db.permission_level({"player": name})
 
     response_body = Permission(player=name, level=level)
@@ -46,7 +46,7 @@ async def get_permission(request: Request, name: str) -> Permission:
 
 
 @router.put("/permission")
-async def put_permission(request: Request, payload: Permission) -> Permission:
+async def set_permission(request: Request, payload: Permission) -> Permission:
     if not -2 <= payload.level <= 3:
         raise HTTPException(status_code=422, detail="Permission must be between -2 and 3 inclusive.")
 
