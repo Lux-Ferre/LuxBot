@@ -63,3 +63,8 @@ class PlayerMute(BaseModel):
     reason: str
     length: int
     is_ip: bool
+
+
+# Stats
+class NewStat(BaseModel):
+    stat: str

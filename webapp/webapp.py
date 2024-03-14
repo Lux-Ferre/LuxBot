@@ -4,7 +4,7 @@ from multiprocessing import Queue
 from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
 
-from .routers import admin, chat, custom, pet, mod
+from .routers import admin, chat, custom, pet, mod, stats
 from .internal import security
 
 from repo import Repo
@@ -34,5 +34,6 @@ class WebApp:
         app.include_router(custom.router)
         app.include_router(pet.router)
         app.include_router(mod.router)
+        app.include_router(stats.router)
 
         uvicorn.run(app, host="127.0.0.1", port=8080, log_level="info")
