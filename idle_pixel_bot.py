@@ -16,6 +16,7 @@ from utils import RepeatTimer
 
 class Game:
     def __init__(self, p_q: Queue, game_queue: Queue):
+        self.development_mode = False
         self.env_consts = {}
         self.game_ws = None
         self.p_q = p_q
@@ -101,10 +102,7 @@ class Game:
         :param raw_message: String containing websocket data
         :type raw_message: str
         """
-
-        development_mode = False
-
-        if development_mode:
+        if self.development_mode:
             self.log_ws_message(raw_message, True)
 
         split_message = raw_message.split("=", 1)
@@ -183,7 +181,9 @@ class Game:
     def send_ws_message(self, action: dict):
         message = action["payload"]
 
-        self.log_ws_message(message, False)
+        if self.development_mode:
+            self.log_ws_message(message, False)
+
         try:
             self.game_ws.send(message)
         except Exception as e:
