@@ -32,6 +32,9 @@ class WSHandlers:
                 "EVENT_GLOBAL_PROGRESS": {
                     "target": self.on_event_global_progress
                 },
+                "REFRESH_TCG": {
+                    "target": self.on_refresh_tcg
+                }
             }
 
     def dispatch(self, action: dict):
@@ -155,3 +158,13 @@ class WSHandlers:
             "source": "ws_handlers",
         }
         self.p_q.put(action)
+
+    def on_refresh_tcg(self, message: dict):
+        action = {
+            "target": "tcg",
+            "action": "handle_refresh_tcg",
+            "payload": message,
+            "source": "ws_handlers",
+        }
+        self.p_q.put(action)
+
