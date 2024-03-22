@@ -16,6 +16,7 @@ from admin_stuff import Admin
 from stats_stuff import Stats
 from event_stuff import Event
 from integration_stuff import Integrations
+from tcg_stuff import TCG
 
 
 class PrimaryHandler:
@@ -34,6 +35,7 @@ class PrimaryHandler:
         self.stats = Stats(self.p_q, self.db)
         self.event = Event(self.p_q, self.db)
         self.integration = Integrations(self.p_q, self.db)
+        self.tcg = TCG(self.p_q, self.db)
 
         self.ws_handlers.apply_dispatch_map()
 
@@ -105,5 +107,7 @@ if __name__ == '__main__':
                 primary_handler.event.dispatch(action)
             case "integration":
                 primary_handler.integration.dispatch(action)
+            case "tcg":
+                primary_handler.tcg.dispatch(action)
             case _:
                 print(f"Invalid primary handler for: {action}")
