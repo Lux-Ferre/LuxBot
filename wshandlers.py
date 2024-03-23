@@ -146,9 +146,15 @@ class WSHandlers:
         else:
             print(f"DIALOGUE: {data}")
 
-    @staticmethod
-    def on_valid_login(message: dict):
+    def on_valid_login(self, message: dict):
         print("Signature verified. Login Successful.")
+        action = {
+            "target": "game",
+            "action": "set_ws_active",
+            "payload": message,
+            "source": "ws_handlers",
+        }
+        self.p_q.put(action)
 
     def on_event_global_progress(self, message: dict):
         action = {

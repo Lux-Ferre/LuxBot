@@ -22,6 +22,7 @@ class Game:
         self.p_q = p_q
         self.game_queue = game_queue
         self.game_vars = {}
+        self.ws_active = False
 
         self.dispatch_map = {
             "set_items": {
@@ -32,7 +33,10 @@ class Game:
             },
             "send_ws_message": {
                 "target": self.send_ws_message
-            }
+            },
+            "set_ws_active": {
+                "target": self.set_ws_active
+            },
         }
 
     def get_env_var(self, env_var: str) -> str:
@@ -137,6 +141,7 @@ class Game:
         :param ws: websocket
         :param error: Exception object
         """
+        self.ws_active = False
 
         if isinstance(error, websocket.WebSocketConnectionClosedException):
             print("Connection closed. Retrying...")
@@ -183,12 +188,14 @@ class Game:
 
         if self.development_mode:
             self.log_ws_message(message, False)
-
-        try:
-            self.game_ws.send(message)
-        except Exception as e:
-            print(e)
-            traceback.print_tb(e.__traceback__)
+        if self.ws_active or message[:5] == "LOGIN":
+            try:
+                self.game_ws.send(message)
+            except Exception as e:
+                print(e)
+                traceback.print_tb(e.__traceback__)
+        else:
+            print(f"Attempted ws send while offline: {message}")
 
     def dispatch(self, action: dict):
         action_target = self.dispatch_map.get(action["action"], None)
@@ -206,6 +213,9 @@ class Game:
     def print_items(self, action: dict):
         print(self.game_vars)
 
+    def set_ws_active(self, action: dict):
+        self.ws_active = True
+
     def run(self):
         self.env_consts = self.get_env_consts()
 
@@ -221,7 +231,7 @@ class Game:
                                               )
 
         self.game_ws.run_forever(dispatcher=rel,
-                                 reconnect=120,
+                                 reconnect=60,
                                  sslopt={
                                          "cert_reqs": ssl.CERT_NONE,
                                  })  # Set dispatcher to automatic reconnection, 5 second reconnect delay if connection closed unexpectedly, no SSL cert
