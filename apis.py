@@ -33,6 +33,8 @@ class APIs:
         """Return dict containing all required environment variables at application launch."""
         env_const_dict = {
             "DISCORD_TEST_WEBHOOK_URL": "",
+            "DISCORD_CHAT_WEBHOOK_URL": "",
+            "DISCORD_EVENT_WEBHOOK_URL": "",
         }
 
         for key in env_const_dict:
@@ -51,7 +53,7 @@ class APIs:
 
     async def chat_mirror_webhook(self, action: dict):
         message = action["payload"]
-        hook_url = self.env_consts["DISCORD_TEST_WEBHOOK_URL"]
+        hook_url = self.env_consts["DISCORD_CHAT_WEBHOOK_URL"]
 
         message = message.replace("@mods", "<@&291724449340719104>", 1)
         allowed = discord.AllowedMentions(everyone=False, users=False,
@@ -63,7 +65,7 @@ class APIs:
 
     async def event_webhook(self, action: dict):
         message = action["payload"]
-        hook_url = self.env_consts["DISCORD_TEST_WEBHOOK_URL"]
+        hook_url = self.env_consts["DISCORD_EVENT_WEBHOOK_URL"]
 
         allowed = discord.AllowedMentions(everyone=False, users=False,
                                           roles=[discord.Object(id="1142985685184282705", type=discord.Role)])
