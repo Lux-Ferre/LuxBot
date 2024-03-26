@@ -302,7 +302,21 @@ class Stats:
 
         uuid_pattern = re.compile(r'[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}')
         if uuid_pattern.search(message):
-            current_stats["raid_ids"] += 1  # 24/03/24 23:45
+            current_stats["raid_ids"] += 1  # 26/03/2024
+
+            if current_stats["raid_ids"] % 100 == 0:
+                reply_string = f"{player['username'].capitalize()} just shared the {current_stats['raid_ids']}th raid ID! (Since I started tracking)"
+                reply_data = {
+                    "player": player["username"],
+                    "command": "raid_ids",
+                    "payload": reply_string,
+                }
+                send_action = Utils.gen_send_action("chat", reply_data)
+
+                if send_action:
+                    self.p_q.put(send_action)
+                else:
+                    print("stats_stuff error: Invalid source for send.")
 
         update_data = {
             "key": "chat_stats",
