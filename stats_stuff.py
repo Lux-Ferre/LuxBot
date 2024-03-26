@@ -300,7 +300,7 @@ class Stats:
             else:
                 current_stats["botofnades_requests"] += 1
 
-        uuid_pattern = re.compile(r'^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$')
+        uuid_pattern = re.compile(r'[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}')
         if uuid_pattern.search(message):
             current_stats["raid_ids"] += 1  # 24/03/24 23:45
 
