@@ -55,7 +55,7 @@ class Event:
     def update_event_status(self):
         start_timer = self.current_event_start_timer
         running_timer = self.current_event_running_timer
-        if start_timer > 0 and not self.event_countdown_started:
+        if start_timer > 2 and not self.event_countdown_started:
             self.start_event_countdown()
         elif running_timer < 0 and self.event_countdown_started:
             self.handle_event_end()
