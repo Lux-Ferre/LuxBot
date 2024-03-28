@@ -15,16 +15,20 @@ Those include:
 
 	- {elites[0]} elite achievement sets completed!
 	- {skills[0]} skills reached the max level of 100!
+
+	- {raid_ids[0]} raid codes shared (since 26/03/24)!
 ======================================================================================
 Every day that means:
 	- {chats[1]} chat messages and {yells[1]} server messages sent!
 	- {diamonds[1]} diamonds, {blood_diamonds[1]} blood diamonds, and {sigils[1]} monster sigils have been found!
 	- {goblins[1]} gem goblins, and {blood_goblins[1]} blood gem goblins have been fought!
-	- {elites[1]} elites and {skills[1]} skills have been completed!
+	- {elites[1]} elites, and {skills[1]} skills have been completed!
+	- {raid_ids[1]} raid codes shared (since 26/03/24)!
 ======================================================================================
 That works out to be:
 	- {chats[2]} chat messages and {yells[2]} server messages sent!
 	- {diamonds[2]} diamonds, {blood_diamonds[2]} blood diamonds, and {sigils[2]} monster sigils found!
 	- {goblins[2]} gem goblins, and {blood_goblins[2]} blood gem goblins fought!
 	- {elites[2]} elites and {skills[2]} skills completed!
+	- {raid_ids[1]} raid codes shared (since 26/03/24)!
 every hour!

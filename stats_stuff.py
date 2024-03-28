@@ -395,9 +395,12 @@ class Stats:
         start_date = chat_stats["start_date"]
 
         start_datetime = datetime.strptime(start_date, "%d/%m/%y %H:%M")
+        total_delta = datetime.now() - start_datetime
+        total_time = round(total_delta.total_seconds())
 
-        delta = datetime.now() - start_datetime
-        total_time = round(delta.total_seconds())
+        raids_start_date = datetime.strptime("26/03/2024 00:00", "%d/%m/%y %H:%M")
+        raids_delta = datetime.now() - raids_start_date
+        raids_time = round(raids_delta.total_seconds())
 
         mapping = {
             "chats": self.__per_time(total_time, chat_stats["total_messages"]),
@@ -413,6 +416,7 @@ class Stats:
             "skills": self.__per_time(total_time, chat_stats["max_levels"]),
             "golds": self.__per_time(total_time, chat_stats["gold_armour"]),
             "wikibot": self.__per_time(total_time, chat_stats["wikibot"]),
+            "raid_ids": self.__per_time(raids_time, chat_stats["raid_ids"])
         }
 
         with open("assets/chat_stats.template") as my_file:
