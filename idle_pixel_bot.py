@@ -1,12 +1,11 @@
-import asyncio
 import os
 import queue
 import websocket
 import rel
 import ssl
 import traceback
+import requests
 
-from playwright.async_api import async_playwright
 from bs4 import BeautifulSoup
 from datetime import datetime
 from multiprocessing.queues import Queue
@@ -66,7 +65,7 @@ class Game:
         except queue.Empty:
             pass
 
-    async def get_signature(self) -> str:
+    def get_signature(self) -> str:
         """
         Uses a Playwright headless browser to authenticate login.
 
@@ -78,19 +77,27 @@ class Game:
         :return: Authentication signature
         :rtype: str
         """
-        async with async_playwright() as p:
-            browser_type = p.chromium
-            browser = await browser_type.launch_persistent_context("persistent_context")
-            page = await browser.new_page()
+        with requests.session() as s:
+            home_page = s.get("https://idle-pixel.com/login")
+            soup = BeautifulSoup(home_page.text, 'html.parser')
+            csrf = soup.find(attrs={"name": "csrfmiddlewaretoken"})['value']
+            headers = {
+                "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36",
+                "Referrer-Policy": "same-origin",
+                "Referer": "https://idle-pixel.com/login/",
+            }
+            payload = {
+                "csrfmiddlewaretoken": csrf,
+                "server_selected": "",
+                "username": self.env_consts["IP_USERNAME"],
+                "password": self.env_consts["IP_PASSWORD"]
+            }
 
-            await page.goto("https://idle-pixel.com/login/")
-            await page.locator('[id=id_username]').fill(self.env_consts["IP_USERNAME"])
-            await page.locator('[id=id_password]').fill(self.env_consts["IP_PASSWORD"])
-            await page.locator("[id=login-submit-button]").click()
+            login = s.post("https://idle-pixel.com/login/", data=payload, headers=headers)
 
-            page_content = await page.content()
-            soup = BeautifulSoup(page_content, 'html.parser')
-            script_tag = soup.find("script").text
+            game_soup = BeautifulSoup(login.text, 'html.parser')
+
+            script_tag = game_soup.find("script").text
 
             sig_plus_wrap = script_tag.split(";", 1)[0]
 
@@ -164,7 +171,7 @@ class Game:
         """
         print("Opened connection.")
         print("Acquiring signature...")
-        signature = asyncio.run(self.get_signature())
+        signature = self.get_signature()
         print("Signature acquired.")
         print("Logging in...")
         self.send_ws_message({"payload": f"LOGIN={signature}"})
