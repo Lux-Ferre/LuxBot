@@ -398,7 +398,7 @@ class Stats:
         total_delta = datetime.now() - start_datetime
         total_time = round(total_delta.total_seconds())
 
-        raids_start_date = datetime.strptime("26/03/2024 00:00", "%d/%m/%y %H:%M")
+        raids_start_date = datetime.strptime("26/03/24 00:00", "%d/%m/%y %H:%M")
         raids_delta = datetime.now() - raids_start_date
         raids_time = round(raids_delta.total_seconds())
 
