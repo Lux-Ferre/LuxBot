@@ -67,20 +67,15 @@ class Game:
 
     def get_signature(self) -> str:
         """
-        Uses a Playwright headless browser to authenticate login.
-
-        User authentication is done via HTTP, the server sends an authentication signature to the client which is then
-        sent as the first frame over the websocket.
-
-        A browser is used to comply with CORS security measures.
+        Uses requests to log into the webserver and retrieve the authentication signature for connecting to the websocket server.
 
         :return: Authentication signature
         :rtype: str
         """
         with requests.session() as s:
             home_page = s.get("https://idle-pixel.com/login")
-            soup = BeautifulSoup(home_page.text, 'html.parser')
-            csrf = soup.find(attrs={"name": "csrfmiddlewaretoken"})['value']
+            home_soup = BeautifulSoup(home_page.text, 'html.parser')
+            csrf = home_soup.find(attrs={"name": "csrfmiddlewaretoken"})['value']
             headers = {
                 "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36",
                 "Referrer-Policy": "same-origin",
