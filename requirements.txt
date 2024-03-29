@@ -1,7 +1,12 @@
+# Game log in
 requests
 beautifulsoup4
+
+# Game websocket handling
 websocket-client
 rel
+
+# FastAPI and related
 fastapi
 aiohttp
 uvicorn
