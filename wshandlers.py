@@ -78,6 +78,12 @@ class WSHandlers:
                 "payload": message,
                 "source": "ws_handlers",
             },
+            {
+                "target": "integration",
+                "action": "mirror_yell_to_discord",
+                "payload": message,
+                "source": "ws_handlers",
+            },
         ]
 
         for action in actions:

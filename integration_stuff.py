@@ -23,6 +23,9 @@ class Integrations:
             "mirror_chat_to_discord": {
                 "target": self.mirror_chat_to_discord
             },
+            "mirror_yell_to_discord": {
+                "target": self.mirror_yell_to_discord
+            },
             "broadcast_event_start": {
                 "target": self.broadcast_event_start
             },
@@ -149,6 +152,26 @@ class Integrations:
             'target': 'api',
             'action': 'chat_mirror_webhook',
             'payload': formatted_chat,
+            'source': 'integration'
+        }
+
+        self.p_q.put(new_action)
+
+    def mirror_yell_to_discord(self, action: dict):
+        message_data = action["payload"]
+
+        message = message_data["payload"]
+        message_time = message_data["time"]
+
+        timestamp = int(message_time.timestamp())
+        timestamp_string = f"<t:{timestamp}:t>"
+
+        formatted_yell = f'*[{timestamp_string}]* **{message}** '
+
+        new_action = {
+            'target': 'api',
+            'action': 'chat_mirror_webhook',
+            'payload': formatted_yell,
             'source': 'integration'
         }
 
