@@ -272,8 +272,11 @@ class Fun:
             converted_list = [float(value) if is_floatable(value) else value for value in input_list]
 
             for value in converted_list:
-                if not (isinstance(value, float) or re.search(pattern, value)):
-                    raise ValueError
+                try:
+                    if not (isinstance(value, float) or re.search(pattern, value)):
+                        raise ValueError
+                except ValueError:
+                    print(f"Better calc attempted with: {converted_list}")
 
             return converted_list
 
