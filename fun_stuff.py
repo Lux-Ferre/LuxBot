@@ -277,6 +277,7 @@ class Fun:
                         raise ValueError
                 except ValueError:
                     print(f"Better calc attempted with: {converted_list}")
+                    return []
 
             return converted_list
 
@@ -295,6 +296,19 @@ class Fun:
         parsed_list = parse_input(input_string)
 
         if len(parsed_list) % 2 == 0:
+            reply_string = f"{player['username'].capitalize()}, [{input_string}] is invalid."
+            reply_data = {
+                "player": player["username"],
+                "command": "better_calc",
+                "payload": reply_string,
+            }
+
+            send_action = Utils.gen_send_action(request_source, reply_data)
+
+            if send_action:
+                self.p_q.put(send_action)
+            else:
+                print("fun_stuff error: Invalid source for send.")
             return
 
         for operator, func in calculation_map.items():
