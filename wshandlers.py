@@ -34,7 +34,10 @@ class WSHandlers:
                 },
                 "REFRESH_TCG": {
                     "target": self.on_refresh_tcg
-                }
+                },
+                "UPDATE_TIMER": {
+                    "target": self.on_update_timer
+                },
             }
 
     def dispatch(self, action: dict):
@@ -180,3 +183,8 @@ class WSHandlers:
         }
         self.p_q.put(action)
 
+    def on_update_timer(self, message: dict):
+        raw_data = message["payload"]
+        update_time = int(raw_data.split()[-1])
+        if update_time % 10 == 0:
+            print(f"Update timer: {update_time}")
