@@ -133,7 +133,7 @@ class Chat:
         parsed_message["has_slur"] = has_slur
         parsed_message["detected_slur"] = detected_slur
 
-        if parsed_message["message"][0] == "!":
+        if len(parsed_message["message"]) > 0 and parsed_message["message"][0] == "!":
             if parsed_message["message"][:8].lower() == "!luxbot:":
                 self.handle_luxbot_command(parsed_message)
 

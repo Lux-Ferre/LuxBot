@@ -107,6 +107,9 @@ class Stats:
         message_text = message_data["message"]
         player = message_data["player"]
 
+        if len(message_text) < 1:
+            return
+
         if player["perm_level"] < 0:
             return
 

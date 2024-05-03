@@ -172,7 +172,7 @@ class Mod:
         message = action["payload"]["message"]
         player = action["payload"]["player"]["username"]
 
-        if message[:5] != "@mods":
+        if len(message) < 5 or message[:5] != "@mods":
             return
 
         note = message[5:]
