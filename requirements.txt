@@ -1,6 +1,7 @@
 # Game log in
 requests
 beautifulsoup4
+pip-system-certs    # Certifi is currently unable to verify part of the cert chain
 
 # Game websocket handling
 websocket-client
