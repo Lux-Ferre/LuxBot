@@ -526,19 +526,16 @@ class Stats:
             new_line = f"{data['location']} - {data['display']}: {data['kills']}\n"
             display_string += new_line
 
-        pastebin_url = Utils.dump_to_pastebin(display_string, "10M")
-
-        reply_string = f"{player['username'].capitalize()}, here are the stats: {pastebin_url}"
-
-        reply_data = {
-            "player": player["username"],
-            "command": "one_life",
-            "payload": reply_string,
+        new_action = {
+            'target': 'api',
+            'action': 'paste',
+            'payload': {
+                "data": display_string,
+                "wrapper": f"{player['username'].capitalize()}, here are the stats: " + "{{url}}",
+                "player": player["username"],
+                "command": "one_life"
+            },
+            'source': 'chat'
         }
 
-        send_action = Utils.gen_send_action(request_source, reply_data)
-
-        if send_action:
-            self.p_q.put(send_action)
-        else:
-            print("stats_stuff error: Invalid source for send.")
+        self.p_q.put(new_action)
