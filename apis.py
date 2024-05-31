@@ -3,8 +3,11 @@ import queue
 import discord
 import aiohttp
 import asyncio
+import requests
 
 from multiprocessing.queues import Queue
+
+from utils import Utils
 
 
 class APIs:
@@ -18,6 +21,9 @@ class APIs:
             },
             "event_webhook": {
                 "target": self.event_webhook,
+            },
+            "paste": {
+                "target": self.paste,
             },
         }
 
@@ -35,6 +41,7 @@ class APIs:
             "DISCORD_TEST_WEBHOOK_URL": "",
             "DISCORD_CHAT_WEBHOOK_URL": "",
             "DISCORD_EVENT_WEBHOOK_URL": "",
+            "IP_DATA_KEY": "",
         }
 
         for key in env_const_dict:
@@ -73,6 +80,36 @@ class APIs:
         async with aiohttp.ClientSession() as session:
             webhook = discord.Webhook.from_url(hook_url, session=session)
             await webhook.send(content=message, allowed_mentions=allowed)
+
+    async def paste(self, action: dict):
+        paste_string = action["payload"]["data"]
+        message_wrapper = action["payload"]["wrapper"]
+        api_key = self.env_consts["IP_DATA_KEY"]
+
+        body = {"paste": paste_string}
+
+        headers = {
+            'accept': 'application/json',
+            'X-API-Key': api_key,
+            'Content-Type': 'application/json',
+        }
+
+        response = requests.post('https://data.idle-pixel.com/api/paste/', headers=headers, json=body)
+        paste_url = f"https://data.idle-pixel.com/api/paste/?paste_id={response.text[1:-1]}"
+        reply_message = message_wrapper.replace("{{url}}", paste_url)
+
+        reply_data = {
+            "player": action["payload"]["player"],
+            "payload": reply_message,
+            "command": action["payload"]["command"]
+        }
+
+        send_action = Utils.gen_send_action("chat", reply_data)
+
+        if send_action:
+            self.p_q.put(send_action)
+        else:
+            print("stats_stuff error: Invalid source for send.")
 
     def run(self):
         while True:
