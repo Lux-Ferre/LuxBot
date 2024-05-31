@@ -126,22 +126,19 @@ class Fun:
             for title in titles:
                 output_string += f"\t{title.capitalize()}\n"
 
-        pastebin_url = Utils.dump_to_pastebin(output_string, "10M")
-
-        reply_string = f"{pastebin_url}"
-
-        reply_data = {
-            "player": player["username"],
-            "command": "pet_stats",
-            "payload": reply_string,
+        new_action = {
+            'target': 'api',
+            'action': 'paste',
+            'payload': {
+                "data": output_string,
+                "wrapper": f"{player['username'].capitalize()}, here's the pet photo list: " + "{{url}}",
+                "player": player["username"],
+                "command": "pet_stats"
+            },
+            'source': request_source
         }
 
-        send_action = Utils.gen_send_action(request_source, reply_data)
-
-        if send_action:
-            self.p_q.put(send_action)
-        else:
-            print("fun_stuff error: Invalid source for send.")
+        self.p_q.put(new_action)
 
     def update_pets(self, action: dict):
         command = action["payload"]
