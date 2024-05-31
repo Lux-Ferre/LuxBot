@@ -431,22 +431,19 @@ class Stats:
             for i in range(3):
                 template = template.replace("{" + f"{key}[{i}]" + "}", str(value[i]))
 
-        pastebin_url = Utils.dump_to_pastebin(template, "10M")
-
-        reply_string = f"{player['username'].capitalize()}, here are the currently tracked stats: {pastebin_url}"
-
-        reply_data = {
-            "player": player["username"],
-            "command": "chat_stats",
-            "payload": reply_string,
+        new_action = {
+            'target': 'api',
+            'action': 'paste',
+            'payload': {
+                "data": template,
+                "wrapper": f"{player['username'].capitalize()}, here are the currently tracked stats: " + "{{url}}",
+                "player": player["username"],
+                "command": "chat_stats"
+            },
+            'source': 'chat'
         }
 
-        send_action = Utils.gen_send_action(request_source, reply_data)
-
-        if send_action:
-            self.p_q.put(send_action)
-        else:
-            print("stats_stuff error: Invalid source for send.")
+        self.p_q.put(new_action)
 
     def get_amy_noobs(self, action: dict):
         player = action["payload"]["player"]
