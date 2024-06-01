@@ -83,10 +83,14 @@ class APIs:
 
     async def paste(self, action: dict):
         paste_string = action["payload"]["data"]
+        paste_title = action["payload"]["title"]
         message_wrapper = action["payload"]["wrapper"]
         api_key = self.env_consts["IP_DATA_KEY"]
 
-        body = {"paste": paste_string}
+        body = {
+            "paste": paste_string,
+            "title": paste_title
+        }
 
         headers = {
             'accept': 'application/json',

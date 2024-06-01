@@ -431,11 +431,14 @@ class Stats:
             for i in range(3):
                 template = template.replace("{" + f"{key}[{i}]" + "}", str(value[i]))
 
+        title = f"Chat Stats: {datetime.utcnow().strftime('%Y/%m/%d %H:%M')} (UTC)"
+
         new_action = {
             'target': 'api',
             'action': 'paste',
             'payload': {
                 "data": template,
+                "title": title,
                 "wrapper": f"{player['username'].capitalize()}, here are the currently tracked stats: " + "{{url}}",
                 "player": player["username"],
                 "command": "chat_stats"
@@ -526,11 +529,14 @@ class Stats:
             new_line = f"{data['location']} - {data['display']}: {data['kills']}\n"
             display_string += new_line
 
+        title = f"One Life Stats: {datetime.utcnow().strftime('%Y/%m/%d %H:%M')} (UTC) - Sort: {sort_type.capitalize()}"
+
         new_action = {
             'target': 'api',
             'action': 'paste',
             'payload': {
                 "data": display_string,
+                "title": title,
                 "wrapper": f"{player['username'].capitalize()}, here are the stats: " + "{{url}}",
                 "player": player["username"],
                 "command": "one_life"

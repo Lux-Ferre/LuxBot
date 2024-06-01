@@ -1,6 +1,7 @@
 import re
 
 from multiprocessing.queues import Queue
+from datetime import datetime
 
 from repo import Repo
 from utils import Utils
@@ -126,11 +127,14 @@ class Fun:
             for title in titles:
                 output_string += f"\t{title.capitalize()}\n"
 
+        paste_title = f"Pet Photo List: {datetime.utcnow().strftime('%Y/%m/%d %H:%M')} (UTC)"
+
         new_action = {
             'target': 'api',
             'action': 'paste',
             'payload': {
                 "data": output_string,
+                "title": paste_title,
                 "wrapper": f"{player['username'].capitalize()}, here's the pet photo list: " + "{{url}}",
                 "player": player["username"],
                 "command": "pet_stats"
