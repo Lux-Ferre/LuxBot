@@ -1,9 +1,9 @@
 Since {start_date} there have been:
-{chats[0]} chat messages sent!
-{nades[0]} BotofNades commands sent!
-{luxbot[0]} LuxBot commands sent!
-{wikibot[0]} WikiSearch bot requests made!
-{yells[0]} server messages sent!
+    - {chats[0]} chat messages sent!
+    - {nades[0]} BotofNades commands sent!
+    - {luxbot[0]} LuxBot commands sent!
+    - {wikibot[0]} WikiSearch bot requests made!
+    - {yells[0]} server messages sent!
 Those include:
 	- {golds[0]} gold armour pieces found!
 	- {diamonds[0]} diamonds found!
