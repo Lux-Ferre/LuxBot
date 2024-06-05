@@ -1,0 +1,15 @@
+To use keywords in your paste, surround them with a space and double braces.
+
+{{ this_is_an_example_keyword }}
+
+Possible keywords:
+
+current_utc_datetime : {{ current_utc_datetime }}
+current_local_date: {{ current_local_date }}
+current_local_time: {{ current_local_time }}
+current_local_datetime: {{ current_local_datetime }}
+
+creation_utc_datetime : {{ creation_utc_datetime }}
+creation_local_date: {{ creation_local_date }}
+creation_local_time: {{ creation_local_time }}
+creation_local_datetime: {{ creation_local_datetime }}

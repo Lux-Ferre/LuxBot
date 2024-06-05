@@ -32,6 +32,9 @@ class Integrations:
             "broadcast_event_end": {
                 "target": self.broadcast_event_end
             },
+            "keyword_demo": {
+                "target": self.demo_keywords
+            }
         }
         self.chat_history = deque([], 5)
 
@@ -217,6 +220,26 @@ class Integrations:
             'action': 'event_webhook',
             'payload': formatted_scores,
             'source': 'integration'
+        }
+
+        self.p_q.put(new_action)
+
+    def demo_keywords(self, action: dict):
+        player = action["payload"]["player"]
+        with open("assets/keyword_demo.template") as my_file:
+            template = my_file.read()
+
+        new_action = {
+            'target': 'api',
+            'action': 'paste',
+            'payload': {
+                "data": template,
+                "title": "Keyword Demonstration",
+                "wrapper": f"{player['username'].capitalize()}, here is the full keyword demonstration pastel: " + "{{url}}",
+                "player": player["username"],
+                "command": "keyword_demo"
+            },
+            'source': 'chat'
         }
 
         self.p_q.put(new_action)

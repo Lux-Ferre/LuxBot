@@ -68,6 +68,12 @@ class Chat:
                 "permission": 0,
                 "help_string": "Replies with a pastebin link containing one life statistics. [!luxbot:one_life:<area|kills>]",
             },
+            "keyword_demo": {
+                "target_module": "integration",
+                "target_command": "keyword_demo",
+                "permission": 1,
+                "help_string": "Replies with a Idle-Pastel link demonstrating the possible paste keywords. [!luxbot:keyword_demo]",
+            },
             "help": {
                 "target_module": None,
                 "target_command": None,
