@@ -127,7 +127,7 @@ class Fun:
             for title in titles:
                 output_string += f"\t{title.capitalize()}\n"
 
-        paste_title = f"Pet Photo List: {datetime.utcnow().strftime('%Y/%m/%d %H:%M')} (UTC)"
+        paste_title = "Pet Photo List: {{ creation_local_datetime }}"
 
         new_action = {
             'target': 'api',

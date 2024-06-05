@@ -431,7 +431,7 @@ class Stats:
             for i in range(3):
                 template = template.replace("{" + f"{key}[{i}]" + "}", str(value[i]))
 
-        title = f"Chat Stats: {datetime.utcnow().strftime('%Y/%m/%d %H:%M')} (UTC)"
+        title = "Chat Stats: {{ creation_local_datetime }}"
 
         new_action = {
             'target': 'api',
@@ -529,7 +529,7 @@ class Stats:
             new_line = f"{data['location']} - {data['display']}: {data['kills']}\n"
             display_string += new_line
 
-        title = f"One Life Stats: {datetime.utcnow().strftime('%Y/%m/%d %H:%M')} (UTC) - Sort: {sort_type.capitalize()}"
+        title = "One Life Stats: {{ creation_local_datetime }}" + f" - Sort: {sort_type.capitalize()}"
 
         new_action = {
             'target': 'api',
