@@ -68,6 +68,12 @@ class Chat:
                 "permission": 0,
                 "help_string": "Replies with a pastebin link containing one life statistics. [!luxbot:one_life:<area|kills>]",
             },
+            "amy_noobs": {
+                "target_module": "stats",
+                "target_command": "amy_noobs",
+                "permission": 1,
+                "help_string": "Replies with some stats on Amy's usage of the word 'noob'. [!luxbot:amy_noobs]",
+            },
             "keyword_demo": {
                 "target_module": "integration",
                 "target_command": "keyword_demo",
