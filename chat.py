@@ -36,7 +36,7 @@ class Chat:
                 "target_module": "fun",
                 "target_command": "pet_stats",
                 "permission": 0,
-                "help_string": "Replies with a pastebin link containing info about the pets database. [!luxbot:pet_stats]",
+                "help_string": "Replies with a Idle-Pastel link containing info about the pets database. [!luxbot:pet_stats]",
             },
             "import": {
                 "target_module": "fun",
@@ -60,13 +60,13 @@ class Chat:
                 "target_module": "stats",
                 "target_command": "get_all_stats",
                 "permission": 0,
-                "help_string": "Replies with a pastebin link containing various chat statistics. [!luxbot:chat_stats]",
+                "help_string": "Replies with a Idle-Pastel link containing various chat statistics. [!luxbot:chat_stats]",
             },
             "one_life": {
                 "target_module": "stats",
                 "target_command": "get_one_life_stats",
                 "permission": 0,
-                "help_string": "Replies with a pastebin link containing one life statistics. [!luxbot:one_life <area|kills>]",
+                "help_string": "Replies with a Idle-Pastel link containing one life statistics. [!luxbot:one_life <area|kills>]",
             },
             "amy_noobs": {
                 "target_module": "stats",
