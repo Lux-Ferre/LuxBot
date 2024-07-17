@@ -238,6 +238,15 @@ class Customs:
                 }
 
                 self.p_q.put(new_action)
+            elif parsed_message["plugin"] == "teamsnotif":
+                new_action = {
+                    "target": "integration",
+                    "action": "teamnotif_hooks_request",
+                    "payload": parsed_message,
+                    "source": "custom",
+                }
+
+                self.p_q.put(new_action)
         else:
             if parsed_message["player_offline"]:
                 new_action = {
