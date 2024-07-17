@@ -5,6 +5,7 @@ from datetime import datetime
 
 from repo import Repo
 from utils import Utils
+from calculator import Calculator
 
 
 class Fun:
@@ -43,6 +44,8 @@ class Fun:
                 "target": self.handle_yell
             },
         }
+
+        self.calculator = Calculator()
 
     def dispatch(self, action: dict):
         target_dict = self.dispatch_map.get(action["action"], None)
@@ -260,74 +263,14 @@ class Fun:
 
         command = message["parsed_command"]
 
-        def parse_input(raw_input: str) -> list:
-            pattern = re.compile(r"([+/*-])")
-            input_with_spaces = re.sub(pattern, r" \1 ", raw_input)
-
-            input_list = input_with_spaces.split()
-
-            def is_floatable(n):
-                n = n.replace(".", "", 1)
-                return n.isnumeric()
-
-            converted_list = [float(value) if is_floatable(value) else value for value in input_list]
-
-            for value in converted_list:
-                try:
-                    if not (isinstance(value, float) or re.search(pattern, value)):
-                        raise ValueError
-                except ValueError:
-                    print(f"Better calc attempted with: {converted_list}")
-                    return []
-
-            return converted_list
-
         if command['payload'] is not None:
             input_string = command["payload"]
         else:
             return
 
-        calculation_map = {
-            "*": (lambda a, b: a * b),
-            "/": (lambda a, b: a / b),
-            "+": (lambda a, b: a + b),
-            "-": (lambda a, b: a - b),
-        }
+        result = self.calculator.calc(input_string)
 
-        parsed_list = parse_input(input_string)
-
-        if len(parsed_list) % 2 == 0:
-            reply_string = f"{player['username'].capitalize()}, [{input_string}] is invalid."
-            reply_data = {
-                "player": player["username"],
-                "command": "better_calc",
-                "payload": reply_string,
-            }
-
-            send_action = Utils.gen_send_action(request_source, reply_data)
-
-            if send_action:
-                self.p_q.put(send_action)
-            else:
-                print("fun_stuff error: Invalid source for send.")
-            return
-
-        for operator, func in calculation_map.items():
-            while operator in parsed_list:
-                op_index = parsed_list.index(operator)
-
-                a = parsed_list[op_index - 1]
-                b = parsed_list[op_index + 1]
-
-                if operator == "/" and b == 0:
-                    print("Better calc: divide by zero error.")
-                    return
-                new_value = func(a, b)
-
-                parsed_list[op_index - 1] = new_value
-                del parsed_list[op_index:op_index + 2]
-
-        reply_string = f"{player['username'].capitalize()}, here is the result: {parsed_list[0]}"
+        reply_string = f"{player['username'].capitalize()}, here is the result: {result}"
 
         reply_data = {
             "player": player["username"],
