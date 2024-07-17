@@ -74,6 +74,18 @@ class Chat:
                 "permission": 1,
                 "help_string": "Replies with some stats on Amy's usage of the word 'noob'. [!luxbot:amy_noobs]",
             },
+            "deaths_per_user": {
+                "target_module": "data",
+                "target_command": "deaths_per_user",
+                "permission": 0,
+                "help_string": "Replies with a Idle-Pastel link containing one life death counts per username. [!luxbot:deaths_per_user]",
+            },
+            "levels_lost": {
+                "target_module": "data",
+                "target_command": "levels_lost",
+                "permission": 0,
+                "help_string": "Replies with a Idle-Pastel link containing levels lost in one life per enemy. [!luxbot:levels_lost]",
+            },
             "keyword_demo": {
                 "target_module": "integration",
                 "target_command": "keyword_demo",
