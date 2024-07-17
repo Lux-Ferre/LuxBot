@@ -1,3 +1,5 @@
+import os
+
 from multiprocessing.queues import Queue
 from collections import deque
 from datetime import datetime, timedelta, timezone
@@ -19,6 +21,9 @@ class Integrations:
             },
             "handle_pet_helper": {
                 "target": self.handle_pet_helper
+            },
+            "teamnotif_hooks_request": {
+                "target": self.teamnotif_hooks_request
             },
             "mirror_chat_to_discord": {
                 "target": self.mirror_chat_to_discord
@@ -243,3 +248,30 @@ class Integrations:
         }
 
         self.p_q.put(new_action)
+
+    def teamnotif_hooks_request(self, action: dict):
+        team_list = ["feralamy", "feralhobnob", "feralzlef", "feralcammy", "feralpiet", "feraljay", "feralofnades", "ferallone"]
+        player = action["payload"]["player"]
+        if player["username"] not in team_list:
+            return
+        hook_type = action["payload"]["payload"]
+        if hook_type == "player":
+            hook = os.environ.get("TEAMS_DISCORD_HOOK_PLAYER")
+        elif hook_type == "team":
+            hook = os.environ.get("TEAMS_DISCORD_HOOK_TEAM")
+        else:
+            hook = None
+
+        reply_data = {
+            "player": player["username"],
+            "plugin": "teamsnotif",
+            "command": f"{hook_type}_hook",
+            "payload": f"{hook}",
+        }
+
+        send_action = Utils.gen_send_action("custom", reply_data)
+
+        if send_action:
+            self.p_q.put(send_action)
+        else:
+            print("integration error: Invalid source for send.")
