@@ -91,5 +91,5 @@ class Calculator:
 	def calc(self, input_value):
 		try:
 			return self.calculate(input_value)[0]
-		except ValueError or ZeroDivisionError or OverflowError:
+		except (ValueError, ZeroDivisionError, OverflowError):
 			return "Invalid input"
