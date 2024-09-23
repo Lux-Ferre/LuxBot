@@ -119,6 +119,16 @@ class Mod:
             else:
                 print("mod_stuff error: Invalid source for send.")
 
+        if message_data["command"] in ["context", "automod", "at"]:
+            new_action = {
+                'target': 'api',
+                'action': 'modmod_webhook',
+                'payload': message_data["payload"],
+                'source': 'integration'
+            }
+
+            self.p_q.put(new_action)
+
     def modmod_hello(self, action: dict):
         if action['payload']['parsed_command']['payload'] == "1:0":
             message_data = {
