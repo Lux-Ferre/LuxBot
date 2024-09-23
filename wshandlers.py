@@ -68,6 +68,8 @@ class WSHandlers:
         self.p_q.put(action)
 
     def on_yell(self, message: dict):
+        # Temporary fix for change to yell ws frame. Correct handling should keep both username and message.
+        message["payload"] = message["payload"].split("~")[-1]
         actions = [
             {
                 "target": "stats",
