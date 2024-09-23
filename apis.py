@@ -25,6 +25,9 @@ class APIs:
             "paste": {
                 "target": self.paste,
             },
+            "modmod_webhook": {
+                "target": self.modmod_webhook,
+            }
         }
 
     def get_env_var(self, env_var: str) -> str:
@@ -42,6 +45,7 @@ class APIs:
             "DISCORD_CHAT_WEBHOOK_URL": "",
             "DISCORD_EVENT_WEBHOOK_URL": "",
             "IP_DATA_KEY": "",
+            "DISCORD_MODMOD_WEBHOOK_URL": "",
         }
 
         for key in env_const_dict:
@@ -63,6 +67,17 @@ class APIs:
         hook_url = self.env_consts["DISCORD_CHAT_WEBHOOK_URL"]
 
         message = message.replace("@mods", "<@&291724449340719104>", 1)
+        allowed = discord.AllowedMentions(everyone=False, users=False,
+                                          roles=[discord.Object(id="291724449340719104", type=discord.Role)])
+
+        async with aiohttp.ClientSession() as session:
+            webhook = discord.Webhook.from_url(hook_url, session=session)
+            await webhook.send(content=message, allowed_mentions=allowed)
+
+    async def modmod_webhook(self, action: dict):
+        message = action["payload"]
+        hook_url = self.env_consts["DISCORD_MODMOD_WEBHOOK_URL"]
+
         allowed = discord.AllowedMentions(everyone=False, users=False,
                                           roles=[discord.Object(id="291724449340719104", type=discord.Role)])
 
