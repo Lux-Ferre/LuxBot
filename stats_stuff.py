@@ -142,10 +142,20 @@ class Stats:
 
         response = self.generate_dynamic_request_response(player["username"], required_value, time_frame)
 
-        print(response)
+        reply_data = {
+            "player": player["username"],
+            "command": "dyn_stats",
+            "payload": response,
+        }
+
+        send_action = Utils.gen_send_action("chat", reply_data)
+
+        self.p_q.put(send_action)
+
 
     @staticmethod
     def get_dynamic_request_type(message_text: str) -> str | None:
+        message_text = message_text.lower()
         required_value = None
 
         if "amy" in message_text:
