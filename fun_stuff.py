@@ -292,6 +292,8 @@ class Fun:
 
         if "agrodon" in message.lower():
             reply_string = "Wizard hax!"
+        elif "nodorga" in message.lower():
+            reply_string = "Wizard hax!"
         elif "i am smitty" in message.lower():
             reply_string = "Dev hax!"
 
