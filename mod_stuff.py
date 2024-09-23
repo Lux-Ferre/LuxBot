@@ -234,7 +234,7 @@ class Mod:
         if not has_slur:
             return
 
-        bot_list = {"botofnades": "BotofNades", "wikisearch": "WikiSearch"}
+        bot_list = {"botofnades": "BotofNades", "wikisearch": "WikiSearch", "ava": "Ava"}
         if player["username"] in bot_list:
             reply_string = f"Silly {bot_list[player['username']]}, you shouldn't copy the fleshbags' bad words. I forgive you though."
             send_action = Utils.gen_send_action("chat", {"payload": reply_string})
